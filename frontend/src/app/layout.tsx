@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { getBaseUrl } from "@/lib/utils";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,12 +19,7 @@ export const metadata: Metadata = {
   description: "Sleek developer insights, code walkthroughs, and technical tutorials.",
   keywords: ["programming", "nextjs", "react", "typescript", "coding", "software engineering", "tech tutorials", "web development", "system architecture"],
   authors: [{ name: "SyntaxFlow Team" }],
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL 
-      || (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : '')
-      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
-      || 'http://localhost:3000'
-  ),
+  metadataBase: new URL(getBaseUrl()),
   robots: {
     index: true,
     follow: true,
