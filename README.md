@@ -1,4 +1,4 @@
-# Chakradhar Articles - Full-Stack Technology Blog CMS
+
 
 A complete article publishing platform built with **Next.js** (frontend), **Sanity CMS** (primary content source), and **Express.js + SQLite** (legacy fallback API).
 
