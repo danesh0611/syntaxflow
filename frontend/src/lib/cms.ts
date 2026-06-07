@@ -45,7 +45,12 @@ const contentApi = async <T>(params: Record<string, string>): Promise<T | null> 
   
   // Resolve relative URLs for Node.js server-side execution (e.g., during sitemap creation)
   const isServer = typeof window === 'undefined';
-  const baseUrl = isServer ? (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000') : '';
+  const baseUrl = isServer
+    ? (process.env.NEXT_PUBLIC_SITE_URL 
+      || (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : '')
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')
+      || 'http://localhost:3000')
+    : '';
 
   try {
     const response = await fetch(`${baseUrl}/api/content?${query}`);
