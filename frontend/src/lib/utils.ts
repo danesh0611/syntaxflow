@@ -8,5 +8,8 @@ export function getBaseUrl(): string {
     url = `https://${url}`;
   }
   
+  // Strip trailing slashes to prevent double slashes in paths
+  url = url.replace(/\/+$/, '');
+  
   return url;
 }
