@@ -42,6 +42,9 @@ export const metadata: Metadata = {
     title: "SyntaxFlow | Tech Insights & Tutorials",
     description: "Sleek developer insights, code walkthroughs, and technical tutorials.",
   },
+  verification: {
+    google: "C4iB6CbG_q5hRMd0VkPlhScF1MY5KFB-BthH5J-AS7E",
+  },
 };
 
 export default function RootLayout({
