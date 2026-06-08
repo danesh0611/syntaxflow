@@ -46,7 +46,10 @@ export const metadata: Metadata = {
     description: "Sleek developer insights, code walkthroughs, and technical tutorials.",
   },
   verification: {
-    google: "C4iB6CbG_q5hRMd0VkPlhScF1MY5KFB-BthH5J-AS7E",
+    google: [
+      "C4iB6CbG_q5hRMd0VkPlhScF1MY5KFB-BthH5J-AS7E",
+      "T8obucIjYrueTKBWLXFoJzGp9ChKYxaoRzWWsnQwdOg",
+    ],
   },
 };
 
