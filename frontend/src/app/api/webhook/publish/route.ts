@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createHmac } from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { getBaseUrl } from '@/lib/utils';
 
-// Helper to verify Sanity webhook signature using HMAC-SHA256
+export const runtime = 'edge';
+
+// Helper to verify Sanity webhook signature using standard Web Crypto API (HMAC-SHA256)
 async function verifySignature(request: Request, secret: string): Promise<boolean> {
   const signatureHeader = request.headers.get('x-sanity-signature');
   if (!signatureHeader) {
@@ -25,12 +26,36 @@ async function verifySignature(request: Request, secret: string): Promise<boolea
   const timestamp = timestampPart.split('=')[1];
   const signature = signaturePart.split('=')[1];
 
-  // Calculate expected HMAC
-  const hmac = createHmac('sha256', secret);
-  hmac.update(`${timestamp}.${rawBody}`);
-  const expectedSignature = hmac.digest('hex');
+  const payload = `${timestamp}.${rawBody}`;
 
-  return signature === expectedSignature;
+  try {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(secret);
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+
+    const payloadData = encoder.encode(payload);
+    const signatureBuffer = await crypto.subtle.sign(
+      'HMAC',
+      cryptoKey,
+      payloadData
+    );
+
+    const hashArray = Array.from(new Uint8Array(signatureBuffer));
+    const expectedSignature = hashArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    return signature === expectedSignature;
+  } catch (err) {
+    console.error('Error verifying webhook signature using Web Crypto:', err);
+    return false;
+  }
 }
 
 function revalidatePaths(slug: string) {

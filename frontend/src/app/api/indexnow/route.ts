@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getBaseUrl } from '@/lib/utils';
 import { contentSource } from '@/lib/cms';
 
+export const runtime = 'edge';
+
 export async function POST(request: Request) {
   try {
     let urls: string[] = [];

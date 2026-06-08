@@ -5,6 +5,7 @@ import { isSanityConfigured } from '@/lib/sanity';
 import type { Article, Category } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 type SanityCategoryDoc = {
   _id: string;
