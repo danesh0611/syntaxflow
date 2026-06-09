@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
 import { getBaseUrl } from '@/lib/utils';
 
 export const runtime = 'edge';
@@ -58,13 +57,21 @@ async function verifySignature(request: Request, secret: string): Promise<boolea
   }
 }
 
-function revalidatePaths(slug: string) {
+async function triggerDeploy(slug: string) {
+  const deployHookUrl = process.env.CLOUDFLARE_DEPLOY_HOOK_URL;
+  if (!deployHookUrl) {
+    console.warn('CLOUDFLARE_DEPLOY_HOOK_URL is not set — skipping rebuild trigger.');
+    return;
+  }
   try {
-    revalidatePath('/');
-    revalidatePath(`/articles/${slug}`);
-    console.log(`Successfully revalidated paths for slug: ${slug}`);
+    const res = await fetch(deployHookUrl, { method: 'POST' });
+    if (res.ok) {
+      console.log(`Deploy triggered for slug: ${slug}`);
+    } else {
+      console.error(`Deploy hook failed: HTTP ${res.status}`);
+    }
   } catch (error) {
-    console.error('Failed to revalidate Next.js cache paths:', error);
+    console.error('Failed to trigger Cloudflare Pages deploy:', error);
   }
 }
 
@@ -143,7 +150,7 @@ export async function POST(request: Request) {
       );
       
       // Proactively revalidate cache paths even if IndexNow fails
-      revalidatePaths(slugString);
+      await triggerDeploy(slugString);
 
       return NextResponse.json(
         { success: false, error: `IndexNow returned status ${status}`, details: errorText },
@@ -152,7 +159,7 @@ export async function POST(request: Request) {
     }
 
     // 6. Revalidate cache on success
-    revalidatePaths(slugString);
+    await triggerDeploy(slugString);
 
     return NextResponse.json({
       success: true,
