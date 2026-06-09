@@ -278,7 +278,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-foreground">{article.author}</h4>
-                  <p className="text-xs text-muted">Thank you for reading! More articles on SyntaxFlow.</p>
+                  <p className="text-xs text-muted">Author at SyntaxFlow</p>
                 </div>
               </div>
               <time

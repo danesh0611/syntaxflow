@@ -150,35 +150,19 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   CARD GLOW — gradient border on hover
-═══════════════════════════════════════════════ */
+   CARD HOVER — clean border and shadow transition
+   ═══════════════════════════════════════════════ */
 .card-glow {
-  position: relative;
-  isolation: isolate;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
   box-shadow: var(--shadow-card);
 }
-.card-glow::before {
-  content: '';
-  position: absolute;
-  inset: -1.5px;
-  border-radius: calc(var(--border-radius-card) + 2px);
-  background: linear-gradient(135deg,
-    var(--accent) 0%,
-    var(--accent-2) 45%,
-    var(--accent-3) 100%
-  );
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: -1;
-  pointer-events: none;
-}
 .card-glow:hover {
-  transform: translateY(-7px);
+  transform: translateY(-6px);
   box-shadow: var(--shadow-card-hover);
+  border-color: var(--accent) !important;
 }
-.card-glow:hover::before { opacity: 0.75; }
 
 /* ═══════════════════════════════════════════════
    GRADIENT TEXT
