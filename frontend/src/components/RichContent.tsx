@@ -7,6 +7,61 @@ import { PortableText, type PortableTextComponents } from '@portabletext/react';
 import hljs from 'highlight.js';
 import { urlForImage } from '@/lib/sanity';
 import type { ArticleContent } from '@/lib/types';
+import katex from 'katex';
+
+interface LatexRendererProps {
+  formula: string;
+  displayMode?: boolean;
+}
+
+export const LatexRenderer = ({ formula, displayMode = false }: LatexRendererProps) => {
+  try {
+    const html = katex.renderToString(formula, {
+      displayMode,
+      throwOnError: false,
+    });
+    return <span dangerouslySetInnerHTML={{ __html: html }} />;
+  } catch (err) {
+    console.error('KaTeX rendering error:', err);
+    return <span>{formula}</span>;
+  }
+};
+
+export const renderLatexText = (text: string): React.ReactNode => {
+  if (!text) return '';
+  const parts = text.split(/(\$\$.*?\$\$|\$.*?\$)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('$$') && part.endsWith('$$')) {
+      const formula = part.slice(2, -2).trim();
+      return <LatexRenderer key={i} formula={formula} displayMode={true} />;
+    } else if (part.startsWith('$') && part.endsWith('$')) {
+      const formula = part.slice(1, -1).trim();
+      return <LatexRenderer key={i} formula={formula} displayMode={false} />;
+    }
+    return part;
+  });
+};
+
+export const processLatexInNodes = (node: React.ReactNode): React.ReactNode => {
+  if (typeof node === 'string') {
+    return renderLatexText(node);
+  }
+  
+  if (Array.isArray(node)) {
+    return node.map((child, i) => <React.Fragment key={i}>{processLatexInNodes(child)}</React.Fragment>);
+  }
+
+  if (React.isValidElement(node)) {
+    const element = node as React.ReactElement<any>;
+    if (element.props && element.props.children) {
+      return React.cloneElement(element, {
+        children: processLatexInNodes(element.props.children),
+      });
+    }
+  }
+
+  return node;
+};
 
 type PortableTextValue = Exclude<ArticleContent, string>;
 
@@ -69,6 +124,14 @@ const portableTextComponents: PortableTextComponents = {
       const code = value?.code || '';
       const language = value?.language || 'plaintext';
 
+      if (language === 'latex' || language === 'math') {
+        return (
+          <div className="my-6 p-6 bg-card-bg border border-card-border rounded-2xl flex justify-center items-center overflow-x-auto shadow-md">
+            <LatexRenderer formula={code} displayMode={true} />
+          </div>
+        );
+      }
+
       let highlighted = code;
       try {
         highlighted =
@@ -99,6 +162,17 @@ const portableTextComponents: PortableTextComponents = {
       );
     },
   },
+  block: {
+    normal: ({ children }) => <p>{processLatexInNodes(children)}</p>,
+    h1: ({ children }) => <h1>{processLatexInNodes(children)}</h1>,
+    h2: ({ children }) => <h2>{processLatexInNodes(children)}</h2>,
+    h3: ({ children }) => <h3>{processLatexInNodes(children)}</h3>,
+    h4: ({ children }) => <h4>{processLatexInNodes(children)}</h4>,
+    h5: ({ children }) => <h5>{processLatexInNodes(children)}</h5>,
+    h6: ({ children }) => <h6>{processLatexInNodes(children)}</h6>,
+    blockquote: ({ children }) => <blockquote>{processLatexInNodes(children)}</blockquote>,
+  },
+  listItem: ({ children }) => <li>{processLatexInNodes(children)}</li>,
 };
 
 export const RichContent = ({ value }: { value: ArticleContent }) => {
@@ -107,6 +181,33 @@ export const RichContent = ({ value }: { value: ArticleContent }) => {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[[rehypeRaw], [rehypeSanitize, contentSchema]]}
+        components={{
+          p: ({ children }) => <p>{processLatexInNodes(children)}</p>,
+          h1: ({ children }) => <h1>{processLatexInNodes(children)}</h1>,
+          h2: ({ children }) => <h2>{processLatexInNodes(children)}</h2>,
+          h3: ({ children }) => <h3>{processLatexInNodes(children)}</h3>,
+          h4: ({ children }) => <h4>{processLatexInNodes(children)}</h4>,
+          h5: ({ children }) => <h5>{processLatexInNodes(children)}</h5>,
+          h6: ({ children }) => <h6>{processLatexInNodes(children)}</h6>,
+          blockquote: ({ children }) => <blockquote>{processLatexInNodes(children)}</blockquote>,
+          li: ({ children }) => <li>{processLatexInNodes(children)}</li>,
+          code({ className, children, ...props }) {
+            const match = /language-(\w+)/.exec(className || '');
+            const lang = match ? match[1] : '';
+            if (lang === 'latex' || lang === 'math') {
+              return (
+                <div className="my-6 p-6 bg-card-bg border border-card-border rounded-2xl flex justify-center items-center overflow-x-auto shadow-md">
+                  <LatexRenderer formula={String(children).replace(/\n$/, '')} displayMode={true} />
+                </div>
+              );
+            }
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          }
+        }}
       >
         {value}
       </ReactMarkdown>
