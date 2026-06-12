@@ -40,7 +40,7 @@ const sanityClient =
         projectId,
         dataset,
         apiVersion,
-        useCdn: false,
+        useCdn: true,
       })
     : null;
 
