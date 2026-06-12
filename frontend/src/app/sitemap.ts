@@ -3,6 +3,7 @@ import { contentSource } from '@/lib/cms';
 import { getBaseUrl } from '@/lib/utils';
 
 export const revalidate = 3600; // Revalidate every hour
+export const runtime = 'edge'; // Force Edge runtime for Cloudflare Pages compatibility
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
@@ -25,12 +26,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const articles = await contentSource.getArticles();
     if (Array.isArray(articles) && articles.length > 0) {
-      const articleUrls = articles.map((article) => ({
-        url: `${baseUrl}/articles/${article.slug}`,
-        lastModified: new Date(article.updatedAt || article.createdAt),
-        changeFrequency: 'weekly' as const,
-        priority: 0.6,
-      }));
+      const articleUrls = articles
+        .filter((article) => article && article.slug)
+        .map((article) => {
+          let lastModified = new Date();
+          const rawDate = article.updatedAt || article.createdAt;
+          if (rawDate) {
+            const parsedDate = new Date(rawDate);
+            if (!isNaN(parsedDate.getTime())) {
+              lastModified = parsedDate;
+            }
+          }
+          return {
+            url: `${baseUrl}/articles/${article.slug}`,
+            lastModified,
+            changeFrequency: 'weekly' as const,
+            priority: 0.6,
+          };
+        });
       return [...routes, ...articleUrls];
     }
   } catch (error) {
@@ -39,3 +52,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return routes;
 }
+
