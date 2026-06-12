@@ -4,6 +4,7 @@ import HomeClient from '@/components/HomeClient';
 
 // Ensure the page fetches latest content from cache or live CDN on request
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 export const metadata: Metadata = {
   title: 'SyntaxFlow | Insights for the Modern Developer',

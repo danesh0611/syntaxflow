@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
 import { getBaseUrl } from '@/lib/utils';
 
+export const dynamicParams = false;
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
