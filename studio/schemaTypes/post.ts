@@ -69,11 +69,9 @@ export default defineType({
     defineField({
       name: 'keywords',
       title: 'Keywords',
-      type: 'array',
-      of: [{ type: 'string' }],
-      options: {
-        layout: 'tags',
-      },
+      type: 'text',
+      rows: 5,
+      description: 'Enter SEO keywords (one per line, or separated by commas).',
     }),
     defineField({
       name: 'publishedAt',

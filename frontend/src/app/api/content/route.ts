@@ -23,7 +23,7 @@ type SanityArticleDoc = {
   body?: Article['content'];
   author?: string;
   tags?: string[];
-  keywords?: string[];
+  keywords?: string | string[];
   mainImage?: { asset?: { url?: string } };
   category?: { title?: string };
   publishedAt?: string;
@@ -69,6 +69,20 @@ const mapCategory = (doc: SanityCategoryDoc): Category => ({
   createdAt: doc._createdAt,
 });
 
+const parseKeywords = (keywordsInput: any): string[] => {
+  if (!keywordsInput) return [];
+  if (Array.isArray(keywordsInput)) {
+    return keywordsInput.map((k: any) => String(k).trim()).filter(Boolean);
+  }
+  if (typeof keywordsInput === 'string') {
+    return keywordsInput
+      .split(/[\n,]+/)
+      .map((k) => k.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
 const mapArticle = (doc: SanityArticleDoc): Article => ({
   id: doc._id,
   title: doc.title,
@@ -79,7 +93,7 @@ const mapArticle = (doc: SanityArticleDoc): Article => ({
   author: doc.author || 'Editorial',
   coverImage: doc.mainImage?.asset?.url || '',
   tags: doc.tags || [],
-  keywords: doc.keywords || [],
+  keywords: parseKeywords(doc.keywords),
   published: true,
   views: 0,
   createdAt: doc.publishedAt || doc._createdAt,
