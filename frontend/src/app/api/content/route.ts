@@ -23,6 +23,7 @@ type SanityArticleDoc = {
   body?: Article['content'];
   author?: string;
   tags?: string[];
+  keywords?: string[];
   mainImage?: { asset?: { url?: string } };
   category?: { title?: string };
   publishedAt?: string;
@@ -52,6 +53,7 @@ const articleProjection = `
   body,
   author,
   tags,
+  keywords,
   mainImage{asset->{url}, alt},
   category->{title, slug},
   publishedAt,
@@ -77,6 +79,7 @@ const mapArticle = (doc: SanityArticleDoc): Article => ({
   author: doc.author || 'Editorial',
   coverImage: doc.mainImage?.asset?.url || '',
   tags: doc.tags || [],
+  keywords: doc.keywords || [],
   published: true,
   views: 0,
   createdAt: doc.publishedAt || doc._createdAt,

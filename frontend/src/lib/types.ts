@@ -49,6 +49,7 @@ export interface Article {
   author: string;
   coverImage: string;
   tags: string[];
+  keywords: string[];
   published: boolean;
   views: number;
   createdAt: string;

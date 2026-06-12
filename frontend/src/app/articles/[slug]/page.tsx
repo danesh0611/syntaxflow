@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       return {
         title: `${article.title} | SyntaxFlow`,
         description,
-        keywords: article.tags.length > 0 ? article.tags : [article.category, 'SyntaxFlow', 'programming'],
+        keywords: article.keywords && article.keywords.length > 0 ? article.keywords : (article.tags.length > 0 ? article.tags : [article.category, 'SyntaxFlow', 'programming']),
         authors: [{ name: article.author }],
         category: article.category,
         alternates: {
@@ -134,7 +134,7 @@ export default async function ArticlePage({ params }: PageProps) {
       '@id': articleUrl,
     },
     url: articleUrl,
-    keywords: article.tags.join(', '),
+    keywords: (article.keywords && article.keywords.length > 0 ? article.keywords : article.tags).join(', '),
     articleSection: article.category,
     inLanguage: 'en-US',
   };
