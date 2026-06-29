@@ -37,7 +37,14 @@ export interface PortableTextCodeBlock {
   code?: string;
 }
 
-export type ArticleContent = string | Array<PortableTextBlock | PortableTextImage | PortableTextCodeBlock>;
+export interface PortableTextVideo {
+  _key: string;
+  _type: 'video';
+  url?: string;
+  caption?: string;
+}
+
+export type ArticleContent = string | Array<PortableTextBlock | PortableTextImage | PortableTextCodeBlock | PortableTextVideo>;
 
 export interface Article {
   id: string;

@@ -63,6 +63,61 @@ export const processLatexInNodes = (node: React.ReactNode): React.ReactNode => {
   return node;
 };
 
+const getEmbedUrl = (url: string): string | null => {
+  if (!url) return null;
+
+  // YouTube checks
+  const ytMatch = url.match(
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
+  );
+  if (ytMatch && ytMatch[1]) {
+    return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  }
+
+  // Vimeo checks
+  const vimeoMatch = url.match(
+    /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/i
+  );
+  if (vimeoMatch && vimeoMatch[1]) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  }
+
+  return null;
+};
+
+export const VideoEmbed = ({ url, caption }: { url: string; caption?: string }) => {
+  const embedUrl = getEmbedUrl(url);
+
+  return (
+    <div className="my-6 w-full">
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-md bg-black">
+        {embedUrl ? (
+          <iframe
+            src={embedUrl}
+            title={caption || 'Video embed'}
+            className="absolute inset-0 w-full h-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        ) : (
+          <video
+            src={url}
+            controls
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            Your browser does not support the video tag.
+          </video>
+        )}
+      </div>
+      {caption && (
+        <p className="mt-2 text-center text-sm text-gray-500 italic">
+          {caption}
+        </p>
+      )}
+    </div>
+  );
+};
+
 type PortableTextValue = Exclude<ArticleContent, string>;
 
 const contentSchema = {
@@ -88,6 +143,9 @@ const contentSchema = {
     'td',
     'blockquote',
     'hr',
+    'iframe',
+    'video',
+    'source',
   ],
   attributes: {
     ...defaultSchema.attributes,
@@ -104,6 +162,35 @@ const contentSchema = {
       ['height'],
       ['loading'],
     ],
+    iframe: [
+      ...(defaultSchema.attributes?.iframe || []),
+      ['src'],
+      ['title'],
+      ['width'],
+      ['height'],
+      ['allow'],
+      ['allowfullscreen', 'allowFullScreen'],
+      ['className'],
+    ],
+    video: [
+      ...(defaultSchema.attributes?.video || []),
+      ['src'],
+      ['controls'],
+      ['width'],
+      ['height'],
+      ['preload'],
+      ['poster'],
+      ['loop'],
+      ['muted'],
+      ['autoplay', 'autoPlay'],
+      ['playsinline', 'playsInline'],
+      ['className'],
+    ],
+    source: [
+      ...(defaultSchema.attributes?.source || []),
+      ['src'],
+      ['type'],
+    ],
   },
 };
 
@@ -119,6 +206,16 @@ const portableTextComponents: PortableTextComponents = {
       }
 
       return <img src={src} alt={alt} className="w-full rounded-xl my-6" />;
+    },
+    video: ({ value }: { value: { url?: string; caption?: string } }) => {
+      const url = value?.url || '';
+      const caption = value?.caption || '';
+
+      if (!url) {
+        return null;
+      }
+
+      return <VideoEmbed url={url} caption={caption} />;
     },
     codeBlock: ({ value }: { value: { code?: string; language?: string } }) => {
       const code = value?.code || '';
@@ -191,6 +288,28 @@ export const RichContent = ({ value }: { value: ArticleContent }) => {
           h6: ({ children }) => <h6>{processLatexInNodes(children)}</h6>,
           blockquote: ({ children }) => <blockquote>{processLatexInNodes(children)}</blockquote>,
           li: ({ children }) => <li>{processLatexInNodes(children)}</li>,
+          iframe: ({ node, ...props }) => {
+            return (
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-md bg-black my-6">
+                <iframe
+                  {...props}
+                  className="absolute inset-0 w-full h-full border-0"
+                  allowFullScreen
+                />
+              </div>
+            );
+          },
+          video: ({ node, ...props }) => {
+            return (
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-md bg-black my-6">
+                <video
+                  {...props}
+                  controls
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+            );
+          },
           code({ className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '');
             const lang = match ? match[1] : '';

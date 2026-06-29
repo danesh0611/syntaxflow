@@ -102,5 +102,36 @@ export default defineType({
         },
       },
     }),
+    defineArrayMember({
+      name: 'video',
+      title: 'Video Embed',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'url',
+          title: 'Video URL',
+          type: 'url',
+          description: 'Supports YouTube, Vimeo, or direct video link (MP4, etc.)',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'caption',
+          title: 'Caption',
+          type: 'string',
+        }),
+      ],
+      preview: {
+        select: {
+          url: 'url',
+          caption: 'caption',
+        },
+        prepare({ url, caption }) {
+          return {
+            title: caption || 'Video Embed',
+            subtitle: url || 'No URL specified',
+          };
+        },
+      },
+    }),
   ],
 });
