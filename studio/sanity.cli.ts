@@ -8,4 +8,5 @@ export default defineCliConfig({
     projectId,
     dataset,
   },
+  studioHost: 'articles1234',
 });

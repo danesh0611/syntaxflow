@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "sanity dev",
-    "build": "sanity build",
+    "build": "sanity build ../frontend/public/studio",
     "deploy": "sanity deploy",
     "start": "sanity dev"
   },
@@ -12,10 +12,11 @@
     "@sanity/vision": "^3.62.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "sanity": "^3.62.0",
+    "sanity": "^6.2.0",
     "styled-components": "^6.4.2"
   },
   "devDependencies": {
+    "@types/node": "^26.0.1",
     "typescript": "^5.5.4"
   }
 }
