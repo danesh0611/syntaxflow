@@ -78,6 +78,22 @@ export default function ChatAssistant() {
       timestamp,
     };
 
+    // Scrape context dynamically at send time to prevent timing/race conditions
+    let activeTitle = contextTitle;
+    let activeContent = contextContent;
+    
+    if (typeof window !== 'undefined' && pathname.startsWith('/articles/')) {
+      const titleEl = document.querySelector('article h1') || document.querySelector('h1');
+      const contentEl = document.querySelector('.article-content') || document.querySelector('article');
+      
+      activeTitle = titleEl?.textContent?.trim() || '';
+      activeContent = contentEl?.textContent?.trim() || '';
+      
+      // Update state for consistency
+      setContextTitle(activeTitle);
+      setContextContent(activeContent);
+    }
+
     const updatedMessages = [...messages, userMessage];
     saveChatHistory(updatedMessages);
     setInput('');
@@ -91,8 +107,8 @@ export default function ChatAssistant() {
         },
         body: JSON.stringify({
           messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
-          contextTitle: contextTitle || undefined,
-          contextContent: contextContent || undefined,
+          contextTitle: activeTitle || undefined,
+          contextContent: activeContent || undefined,
         }),
       });
 
