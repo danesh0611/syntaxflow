@@ -4,6 +4,7 @@ import "./globals.css";
 import Script from "next/script";
 
 import { getBaseUrl } from "@/lib/utils";
+import ChatAssistant from "@/components/ChatAssistant";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -128,6 +129,7 @@ export default function RootLayout({
           `}
         </Script>
         {children}
+        <ChatAssistant />
       </body>
     </html>
   );
