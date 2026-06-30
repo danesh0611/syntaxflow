@@ -9,4 +9,7 @@ export default defineCliConfig({
     dataset,
   },
   studioHost: 'articles1234',
+  project: {
+    basePath: '/studio',
+  },
 });
