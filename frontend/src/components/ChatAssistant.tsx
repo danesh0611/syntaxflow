@@ -313,7 +313,7 @@ export default function ChatAssistant() {
                   className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                    className={`max-w-[85%] w-full px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm break-words min-w-0 ${
                       msg.role === 'user'
                         ? 'bg-gradient-to-tr from-accent to-accent-2 text-white rounded-tr-none'
                         : 'bg-card-bg border border-card-border text-foreground rounded-tl-none markdown-container'
@@ -348,6 +348,17 @@ export default function ChatAssistant() {
                             <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-semibold">
                               {children}
                             </a>
+                          ),
+                          table: ({ node, ...props }) => (
+                            <div className="overflow-x-auto w-full my-3 border border-card-border rounded-xl">
+                              <table className="min-w-full divide-y divide-card-border text-[12px] border-collapse" {...props} />
+                            </div>
+                          ),
+                          th: ({ node, ...props }) => (
+                            <th className="px-3 py-2 bg-card-border/30 font-bold text-left text-foreground border-b border-card-border" {...props} />
+                          ),
+                          td: ({ node, ...props }) => (
+                            <td className="px-3 py-2 text-muted border-b border-card-border" {...props} />
                           ),
                         }}
                       >
