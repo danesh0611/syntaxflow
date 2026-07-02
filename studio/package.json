@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "sanity dev",
-    "build": "sanity build ../frontend/public/studio",
+    "build": "sanity build ../frontend/public/studio --yes",
     "deploy": "sanity deploy",
     "start": "sanity dev"
   },

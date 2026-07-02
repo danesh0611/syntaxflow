@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export default defineType({
@@ -129,6 +130,52 @@ export default defineType({
           return {
             title: caption || 'Video Embed',
             subtitle: url || 'No URL specified',
+          };
+        },
+      },
+    }),
+    defineArrayMember({
+      name: 'html',
+      title: 'HTML Embed',
+      type: 'object',
+      icon: () =>
+        React.createElement(
+          'svg',
+          {
+            viewBox: '0 0 24 24',
+            width: '1em',
+            height: '1em',
+            stroke: 'currentColor',
+            strokeWidth: '2',
+            fill: 'none',
+            strokeLinecap: 'round',
+            strokeLinejoin: 'round',
+          },
+          React.createElement('polyline', { points: '16 18 22 12 16 6' }),
+          React.createElement('polyline', { points: '8 6 2 12 8 18' })
+        ),
+      fields: [
+        defineField({
+          name: 'html',
+          title: 'HTML Code',
+          type: 'text',
+          rows: 10,
+          description: 'Raw HTML/JS/CSS code to render directly in the frontend',
+          validation: (Rule) => Rule.required(),
+        }),
+      ],
+      preview: {
+        select: {
+          html: 'html',
+        },
+        prepare({ html }) {
+          return {
+            title: 'HTML Embed',
+            subtitle: html
+              ? html.length > 50
+                ? html.substring(0, 50) + '...'
+                : html
+              : 'No HTML code',
           };
         },
       },

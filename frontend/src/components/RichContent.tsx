@@ -118,6 +118,47 @@ export const VideoEmbed = ({ url, caption }: { url: string; caption?: string }) 
   );
 };
 
+interface HtmlRendererProps {
+  html: string;
+}
+
+export const HtmlRenderer = ({ html }: HtmlRendererProps) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Find all script elements
+    const scripts = containerRef.current.querySelectorAll('script');
+    
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement('script');
+      
+      // Copy all attributes
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      
+      // Set async to false to execute sequentially in insertion order
+      newScript.async = false;
+      
+      // Copy inline text content
+      newScript.textContent = oldScript.textContent;
+      
+      // Replace the old script tag to trigger execution
+      oldScript.parentNode?.replaceChild(newScript, oldScript);
+    });
+  }, [html]);
+
+  return (
+    <div 
+      ref={containerRef} 
+      className="w-full my-6 html-embed-container"
+      dangerouslySetInnerHTML={{ __html: html }} 
+    />
+  );
+};
+
 type PortableTextValue = Exclude<ArticleContent, string>;
 
 const contentSchema = {
@@ -247,6 +288,13 @@ const portableTextComponents: PortableTextComponents = {
           />
         </pre>
       );
+    },
+    html: ({ value }: { value: { html?: string } }) => {
+      const html = value?.html || '';
+      if (!html) {
+        return null;
+      }
+      return <HtmlRenderer html={html} />;
     },
   },
   marks: {

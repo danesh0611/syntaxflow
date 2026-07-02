@@ -44,7 +44,19 @@ export interface PortableTextVideo {
   caption?: string;
 }
 
-export type ArticleContent = string | Array<PortableTextBlock | PortableTextImage | PortableTextCodeBlock | PortableTextVideo>;
+export interface PortableTextHtml {
+  _key: string;
+  _type: 'html';
+  html?: string;
+}
+
+export type ArticleContent = string | Array<
+  | PortableTextBlock
+  | PortableTextImage
+  | PortableTextCodeBlock
+  | PortableTextVideo
+  | PortableTextHtml
+>;
 
 export interface Article {
   id: string;
