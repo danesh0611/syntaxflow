@@ -129,7 +129,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-G1Q86D2LKP"
+          src="https://www.googletagmanager.com/gtag/js?id=G-ZGD1G5MY9S"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -138,7 +138,7 @@ export default function RootLayout({
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
 
-            gtag('config', 'G-G1Q86D2LKP');
+            gtag('config', 'G-ZGD1G5MY9S');
           `}
         </Script>
         <Script id="microsoft-clarity" strategy="afterInteractive">
