@@ -126,31 +126,61 @@ interface HtmlRendererProps {
 
 export const HtmlRenderer = ({ html }: HtmlRendererProps) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
+  
+  // Check if the html string represents a full HTML document
+  const isFullDocument = /^\s*<!DOCTYPE html/i.test(html) || /<html/i.test(html) || /<body/i.test(html);
 
   React.useEffect(() => {
-    if (!containerRef.current) return;
+    if (isFullDocument || !containerRef.current) return;
 
     // Find all script elements
     const scripts = containerRef.current.querySelectorAll('script');
     
     scripts.forEach((oldScript) => {
-      const newScript = document.createElement('script');
-      
-      // Copy all attributes
-      Array.from(oldScript.attributes).forEach((attr) => {
-        newScript.setAttribute(attr.name, attr.value);
-      });
-      
-      // Set async to false to execute sequentially in insertion order
-      newScript.async = false;
-      
-      // Copy inline text content
-      newScript.textContent = oldScript.textContent;
-      
-      // Replace the old script tag to trigger execution
-      oldScript.parentNode?.replaceChild(newScript, oldScript);
+      // Check if this script has already been executed to prevent double execution
+      if (oldScript.getAttribute('data-executed') === 'true') {
+        return;
+      }
+      oldScript.setAttribute('data-executed', 'true');
+
+      try {
+        const newScript = document.createElement('script');
+        
+        // Copy all attributes
+        Array.from(oldScript.attributes).forEach((attr) => {
+          newScript.setAttribute(attr.name, attr.value);
+        });
+        
+        // Set async to false to execute sequentially in insertion order
+        newScript.async = false;
+        
+        // Copy inline text content. Wrap in IIFE if it is an inline script to isolate scope and prevent global variable re-declaration errors
+        if (oldScript.textContent && oldScript.type !== 'module' && !oldScript.getAttribute('src')) {
+          newScript.textContent = `try { (function(){\n${oldScript.textContent}\n})(); } catch(e) { console.error('Error inside embedded script:', e); }`;
+        } else {
+          newScript.textContent = oldScript.textContent;
+        }
+        
+        // Append the new script to document.body to prevent polluting React's container DOM
+        document.body.appendChild(newScript);
+      } catch (err) {
+        console.error('Failed to execute embedded script:', err);
+      }
     });
-  }, [html]);
+  }, [html, isFullDocument]);
+
+  if (isFullDocument) {
+    return (
+      <div className="w-full my-6 aspect-video rounded-2xl overflow-hidden border border-card-border bg-white dark:bg-card-bg shadow-md">
+        <iframe
+          srcDoc={html}
+          title="Embedded Document"
+          className="w-full h-full border-0"
+          sandbox="allow-scripts allow-same-origin allow-popups"
+        />
+      </div>
+    );
+  }
 
   return (
     <div 
