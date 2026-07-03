@@ -6,6 +6,7 @@
    COLOR TOKENS
 ═══════════════════════════════════════════════ */
 :root {
+  color-scheme: light dark;
   --background: #f4f6ff;
   --foreground: #080f1e;
   --card-bg: #ffffff;
