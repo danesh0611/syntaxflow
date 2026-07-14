@@ -1,18 +1,18 @@
+import { MetadataRoute } from 'next';
 import { contentSource } from '@/lib/cms';
 import { getBaseUrl } from '@/lib/utils';
 
-export const revalidate = 3600; // Revalidate every hour
-export const dynamic = 'force-static'; // Generate statically at build time to prevent timeouts
+export const revalidate = 3600;
 
-export async function GET() {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
   
-  const routes = [
+  const routes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 1.0,
+      priority: 1,
     },
     {
       url: `${baseUrl}/search`,
@@ -39,30 +39,15 @@ export async function GET() {
           return {
             url: `${baseUrl}/articles/${article.slug}`,
             lastModified,
-            changeFrequency: 'weekly',
+            changeFrequency: 'weekly' as const,
             priority: 0.6,
           };
         });
       routes.push(...articleUrls);
     }
   } catch (error) {
-    console.error('Failed to generate dynamic sitemap routes:', error);
+    console.error('Failed to generate sitemap routes:', error);
   }
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${routes.map(route => `  <url>
-    <loc>${route.url}</loc>
-    <lastmod>${route.lastModified.toISOString().split('.')[0]}Z</lastmod>
-    <changefreq>${route.changeFrequency}</changefreq>
-    <priority>${route.priority}</priority>
-  </url>`).join('\n')}
-</urlset>`;
-
-  return new Response(xml, {
-    headers: {
-      'Content-Type': 'text/xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
-    },
-  });
+  return routes;
 }
