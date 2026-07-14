@@ -2,7 +2,7 @@ import { contentSource } from '@/lib/cms';
 import { getBaseUrl } from '@/lib/utils';
 
 export const revalidate = 3600; // Revalidate every hour
-export const runtime = 'edge'; // Force Edge runtime for Cloudflare Pages compatibility
+export const dynamic = 'force-static'; // Generate statically at build time to prevent timeouts
 
 export async function GET() {
   const baseUrl = getBaseUrl();
@@ -53,7 +53,7 @@ export async function GET() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${routes.map(route => `  <url>
     <loc>${route.url}</loc>
-    <lastmod>${route.lastModified.toISOString()}</lastmod>
+    <lastmod>${route.lastModified.toISOString().split('.')[0]}Z</lastmod>
     <changefreq>${route.changeFrequency}</changefreq>
     <priority>${route.priority}</priority>
   </url>`).join('\n')}
