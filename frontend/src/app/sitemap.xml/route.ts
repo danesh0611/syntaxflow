@@ -1,14 +1,13 @@
-import { MetadataRoute } from 'next';
 import { contentSource } from '@/lib/cms';
 import { getBaseUrl } from '@/lib/utils';
 
 export const revalidate = 3600; // Revalidate every hour
 export const runtime = 'edge'; // Force Edge runtime for Cloudflare Pages compatibility
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export async function GET() {
   const baseUrl = getBaseUrl();
-
-  const routes: MetadataRoute.Sitemap = [
+  
+  const routes = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -40,16 +39,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           return {
             url: `${baseUrl}/articles/${article.slug}`,
             lastModified,
-            changeFrequency: 'weekly' as const,
+            changeFrequency: 'weekly',
             priority: 0.6,
           };
         });
-      return [...routes, ...articleUrls];
+      routes.push(...articleUrls);
     }
   } catch (error) {
     console.error('Failed to generate dynamic sitemap routes:', error);
   }
 
-  return routes;
-}
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${routes.map(route => `  <url>
+    <loc>${route.url}</loc>
+    <lastmod>${route.lastModified.toISOString()}</lastmod>
+    <changefreq>${route.changeFrequency}</changefreq>
+    <priority>${route.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
 
+  return new Response(xml, {
+    headers: {
+      'Content-Type': 'text/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+    },
+  });
+}
