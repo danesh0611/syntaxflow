@@ -171,7 +171,7 @@ export const HtmlRenderer = ({ html }: HtmlRendererProps) => {
 
   if (isFullDocument) {
     return (
-      <div className="w-full my-6 aspect-video rounded-2xl overflow-hidden border border-card-border bg-white dark:bg-card-bg shadow-md">
+      <div className="w-full my-6 h-[500px] md:h-[700px] rounded-2xl overflow-hidden border border-card-border bg-white dark:bg-card-bg shadow-md">
         <iframe
           srcDoc={html}
           title="Embedded Document"
