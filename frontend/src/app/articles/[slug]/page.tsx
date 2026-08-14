@@ -172,7 +172,7 @@ export default async function ArticlePage({ params }: PageProps) {
       <Header />
       <main className="max-w-4xl w-full mx-auto px-6 py-10 flex-1">
 
-        {/* ── BREADCRUMBS ─────────────────────────────────── */}
+        {/* BREADCRUMBS */}
         <nav aria-label="Breadcrumb" className="mb-8">
           <ol className="flex items-center gap-1 text-xs text-muted flex-wrap">
             <li>

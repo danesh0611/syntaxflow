@@ -169,7 +169,7 @@ export default function ChatAssistant() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      {/* ── CHAT PANEL ────────────────────────────────────────── */}
+      {/* CHAT PANEL */}
       {isOpen && (
         <div className={`mb-4 bg-card-bg/95 backdrop-blur-xl border border-card-border rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fade-in transition-all duration-300 ${
           isMaximized
@@ -409,7 +409,7 @@ export default function ChatAssistant() {
         </div>
       )}
 
-      {/* ── FAB TRIGGER BUTTON ────────────────────────────────── */}
+      {/* FAB TRIGGER BUTTON */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-14 h-14 rounded-full bg-gradient-to-tr from-accent to-accent-2 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl shadow-accent/30 relative group cursor-pointer"

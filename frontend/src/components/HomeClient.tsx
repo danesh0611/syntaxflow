@@ -35,7 +35,7 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
       <Header />
       <main className="max-w-6xl w-full mx-auto px-6 py-12 flex-1">
 
-        {/* ── HERO ──────────────────────────────────────────── */}
+        {/* HERO */}
         <section className="relative mb-20 text-center py-16 md:py-24 overflow-hidden">
           {/* Floating gradient orbs */}
           <div
@@ -104,7 +104,7 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
           </div>
         </section>
 
-        {/* ── CATEGORIES ────────────────────────────────────── */}
+        {/* CATEGORIES */}
         {initialCategories.length > 0 && (
           <section className="mb-14 animate-fade-up delay-400" id="categories">
             <h2 className="text-sm font-bold mb-4 tracking-widest text-muted uppercase flex items-center gap-2">
@@ -142,7 +142,7 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
           </section>
         )}
 
-        {/* ── ARTICLES ──────────────────────────────────────── */}
+        {/* ARTICLES */}
         <section id="articles" ref={articlesRef} style={{ scrollMarginTop: '80px' }}>
           {/* Section header */}
           <div className="flex items-center justify-between mb-8 animate-fade-up delay-500">

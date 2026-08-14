@@ -1,8 +1,33 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail]     = useState('');
+  const [status, setStatus]   = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [msg, setMsg]         = useState('');
+  const inputRef              = useRef<HTMLInputElement>(null);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || status === 'loading') return;
+    setStatus('loading');
+    setMsg('');
+    try {
+      const res  = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) { setStatus('success'); setMsg(data.message ?? 'Subscribed!'); }
+      else        { setStatus('error');   setMsg(data.error ?? 'Something went wrong.'); }
+    } catch {
+      setStatus('error'); setMsg('Network error. Please try again.');
+    }
+  };
 
   return (
     <footer className="relative border-t border-card-border/50 bg-card-bg/5 text-muted py-14 mt-auto overflow-hidden">
@@ -26,10 +51,66 @@ export const Footer: React.FC = () => {
               <span className="text-xl font-black text-foreground">Flow</span>
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse-glow shadow-lg shadow-accent/50" />
             </div>
-            <p className="text-sm leading-relaxed text-muted/80 max-w-sm">
+            <p className="text-sm leading-relaxed text-muted/80 max-w-sm mb-6">
               A modern publishing platform dedicated to in-depth technology guides,
               DSA walkthroughs, developer tutorials, and systems architecture insights.
             </p>
+
+            {/* Newsletter inline form */}
+            {status === 'success' ? (
+              <div className="flex items-center gap-2.5 text-sm">
+                <span
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-full flex-shrink-0"
+                  style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)' }}
+                >
+                  <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-foreground font-semibold">{msg}</span>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} noValidate className="flex flex-col gap-2 max-w-sm">
+                <p className="text-xs font-bold text-muted/70 uppercase tracking-widest mb-1">Get Notified of New Articles</p>
+                <div className="flex gap-2">
+                  <input
+                    id="footer-subscribe-email"
+                    ref={inputRef}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    required
+                    disabled={status === 'loading'}
+                    className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl text-sm font-medium text-foreground placeholder:text-muted/40 outline-none transition-all duration-200 disabled:opacity-60"
+                    style={{
+                      background: 'var(--card-bg)',
+                      border: status === 'error' ? '1.5px solid rgba(239,68,68,0.5)' : '1.5px solid var(--card-border)',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.5)'; }}
+                    onBlur={(e)  => { e.currentTarget.style.borderColor = status === 'error' ? 'rgba(239,68,68,0.5)' : 'var(--card-border)'; }}
+                  />
+                  <button
+                    id="footer-subscribe-btn"
+                    type="submit"
+                    disabled={status === 'loading' || !email}
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white flex-shrink-0 transition-all duration-200 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 6px 20px -6px rgba(99,102,241,0.5)' }}
+                  >
+                    {status === 'loading' ? (
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                    ) : 'Subscribe'}
+                  </button>
+                </div>
+                {status === 'error' && (
+                  <p className="text-xs text-red-400">{msg}</p>
+                )}
+                <p className="text-[11px] text-muted/50">No spam. Unsubscribe anytime.</p>
+              </form>
+            )}
           </div>
 
           {/* Links */}

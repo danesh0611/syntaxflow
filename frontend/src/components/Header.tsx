@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { SubscribeModal } from '@/components/SubscribeModal';
 
 export const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark' | null>(null);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -42,13 +44,14 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header
-      className={`sticky top-0 z-50 w-full transition-all duration-500 ${
-        scrolled
-          ? 'border-b border-card-border/60 bg-background/85 backdrop-blur-2xl shadow-xl shadow-accent/5'
-          : 'border-b border-transparent bg-background/30 backdrop-blur-md'
-      }`}
-    >
+    <>
+      <header
+        className={`sticky top-0 z-50 w-full transition-all duration-500 ${
+          scrolled
+            ? 'border-b border-card-border/60 bg-background/85 backdrop-blur-2xl shadow-xl shadow-accent/5'
+            : 'border-b border-transparent bg-background/30 backdrop-blur-md'
+        }`}
+      >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
@@ -97,6 +100,18 @@ export const Header: React.FC = () => {
             )}
           </button>
 
+          {/* Subscribe button */}
+          <button
+            id="header-subscribe-btn"
+            onClick={() => setSubscribeOpen(true)}
+            className="p-2.5 rounded-xl text-muted hover:text-foreground hover:bg-card-border/30 active:scale-95 transition-all duration-200"
+            aria-label="Subscribe to SyntaxFlow"
+          >
+            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+          </button>
+
           <Link
             href="/search"
             className="ml-2 flex items-center gap-1.5 text-xs font-bold bg-accent text-white px-4 py-2 rounded-xl hover:bg-accent/90 active:scale-95 transition-all duration-200 shadow-lg shadow-accent/30"
@@ -115,5 +130,9 @@ export const Header: React.FC = () => {
         style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.5), transparent)' }}
       />
     </header>
+
+    {/* Modal is rendered OUTSIDE the header so it escapes the backdrop-blur stacking context */}
+    <SubscribeModal isOpen={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
+    </>
   );
 };
