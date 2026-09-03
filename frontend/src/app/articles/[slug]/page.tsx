@@ -3,10 +3,23 @@ import { contentSource } from '@/lib/cms';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import Link from 'next/link';
-import { RichContent } from '@/components/RichContent';
+import dynamicImport from 'next/dynamic';
 import { getBaseUrl } from '@/lib/utils';
 import { SqlCourseArticleGate } from '@/components/sql-course/SqlCourseArticleGate';
 import { MarkAsReadButton } from '@/components/MarkAsReadButton';
+
+const RichContent = dynamicImport(
+  () => import('@/components/RichContent').then((mod) => mod.RichContent),
+  {
+    loading: () => (
+      <div className="space-y-4 py-8 animate-pulse">
+        <div className="h-4 bg-card-border/40 rounded w-3/4" />
+        <div className="h-4 bg-card-border/40 rounded w-full" />
+        <div className="h-4 bg-card-border/40 rounded w-5/6" />
+      </div>
+    ),
+  }
+);
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;

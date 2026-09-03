@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { PortableText, type PortableTextComponents } from '@portabletext/react';
-import hljs from 'highlight.js';
+import hljs from 'highlight.js/lib/common';
 import { urlForImage } from '@/lib/sanity';
 import type { ArticleContent } from '@/lib/types';
 import katex from 'katex';
