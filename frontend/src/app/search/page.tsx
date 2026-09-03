@@ -20,7 +20,14 @@ function SearchContent() {
       const fetchResults = async () => {
         try {
           setLoading(true);
-          const results = await contentSource.searchArticles(searchQuery);
+          let results = await contentSource.searchArticles(searchQuery);
+          if (Array.isArray(results)) {
+            // Check if user is logged into SQL course
+            const isUserLoggedIn = typeof window !== 'undefined' && !!localStorage.getItem('sql_course_user');
+            if (!isUserLoggedIn) {
+              results = results.filter((a) => a.category?.trim().toLowerCase() !== 'sql');
+            }
+          }
           setArticles(Array.isArray(results) ? results : []);
         } catch (error) {
           console.error('Search failed:', error);

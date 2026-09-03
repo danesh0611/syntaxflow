@@ -12,7 +12,7 @@ export const sanityClient = isSanityConfigured
       projectId: projectId as string,
       dataset,
       apiVersion,
-      useCdn: true,
+      useCdn: false,
     })
   : null;
 

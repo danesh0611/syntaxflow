@@ -104,6 +104,41 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
           </div>
         </section>
 
+        {/* SQL COURSE ANNOUNCEMENT BANNER */}
+        <section className="mb-14 animate-fade-up">
+          <Link
+            href="/sql-course"
+            className="group block relative overflow-hidden rounded-3xl border border-accent/30 bg-gradient-to-r from-accent/15 via-accent-2/10 to-accent-3/15 p-6 sm:p-8 backdrop-blur-xl shadow-xl shadow-accent/5 hover:border-accent/60 hover:shadow-accent/15 transition-all duration-300"
+          >
+            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-accent/20 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-accent text-white shadow-md shadow-accent/30">
+                    New Launch • Free
+                  </span>
+                  <span className="text-xs font-semibold text-accent">Self-Paced Course</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-accent transition-colors">
+                  Master SQL for Tech Interviews with Clearcut Articles 🚀
+                </h2>
+                <p className="text-sm text-muted max-w-2xl leading-relaxed">
+                  Window functions, recursive CTEs, indexing traps, and 100+ real interview schemas without 40-hour slow videos. Register now for free updates & early access!
+                </p>
+              </div>
+
+              <div className="flex-shrink-0">
+                <span className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-white font-bold text-sm shadow-lg shadow-accent/25 group-hover:bg-accent/90 group-hover:scale-105 active:scale-95 transition-all">
+                  <span>Register Free</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </Link>
+        </section>
+
         {/* CATEGORIES */}
         {initialCategories.length > 0 && (
           <section className="mb-14 animate-fade-up delay-400" id="categories">

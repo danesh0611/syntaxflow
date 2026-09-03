@@ -5,8 +5,12 @@ import { Footer } from '@/components/Footer';
 import Link from 'next/link';
 import { RichContent } from '@/components/RichContent';
 import { getBaseUrl } from '@/lib/utils';
+import { SqlCourseArticleGate } from '@/components/sql-course/SqlCourseArticleGate';
+import { MarkAsReadButton } from '@/components/MarkAsReadButton';
 
-export const dynamicParams = false;
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const runtime = 'edge';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -60,17 +64,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export async function generateStaticParams() {
-  try {
-    const articles = await contentSource.getArticles();
-    if (Array.isArray(articles)) {
-      return articles.map((article) => ({ slug: article.slug }));
-    }
-  } catch (error) {
-    console.error('Failed to generate static params:', error);
-  }
-  return [];
-}
+
 
 export default async function ArticlePage({ params }: PageProps) {
   const { slug } = await params;
@@ -266,10 +260,28 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
           )}
 
-          {/* Content */}
-          <div className="article-content max-w-none mb-12 text-foreground/95 leading-relaxed">
-            <RichContent value={article.content} />
-          </div>
+          {/* Content (Gated for SQL course articles) */}
+          <SqlCourseArticleGate isSqlCategory={article.category?.trim().toLowerCase() === 'sql'}>
+            <div className="article-content max-w-none mb-8 text-foreground/95 leading-relaxed">
+              {article.contentType === 'html' && article.htmlContent ? (
+                <div
+                  className="custom-html-content space-y-6"
+                  dangerouslySetInnerHTML={{ __html: article.htmlContent }}
+                />
+              ) : (
+                <RichContent value={article.content} />
+              )}
+            </div>
+
+            {/* Mark as Read Button (ONLY for SQL course articles) */}
+            {article.category?.trim().toLowerCase() === 'sql' && (
+              <MarkAsReadButton
+                slug={article.slug}
+                title={article.title}
+                isSqlCategory={true}
+              />
+            )}
+          </SqlCourseArticleGate>
 
           {/* Author Card */}
           <div className="border-t border-card-border/60 pt-8">

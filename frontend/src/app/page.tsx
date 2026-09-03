@@ -31,10 +31,23 @@ export default async function Home() {
     contentSource.getCategories(),
   ]);
 
+  // Exclude SQL course articles from the public general homepage (accessible only to registered participants in the SQL dashboard)
+  const publicArticles = Array.isArray(articles)
+    ? articles.filter((a) => a.category?.trim().toLowerCase() !== 'sql')
+    : [];
+
+  const publicCategories = Array.isArray(categories)
+    ? categories.filter(
+        (c) =>
+          c.name?.trim().toLowerCase() !== 'sql' &&
+          c.slug?.trim().toLowerCase() !== 'sql'
+      )
+    : [];
+
   return (
     <HomeClient
-      initialArticles={Array.isArray(articles) ? articles : []}
-      initialCategories={Array.isArray(categories) ? categories : []}
+      initialArticles={publicArticles}
+      initialCategories={publicCategories}
     />
   );
 }

@@ -64,6 +64,8 @@ export interface Article {
   slug: string;
   excerpt: string;
   content: ArticleContent;
+  contentType?: 'richText' | 'html';
+  htmlContent?: string;
   category: string;
   author: string;
   coverImage: string;

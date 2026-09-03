@@ -43,6 +43,17 @@ export const Header: React.FC = () => {
     }
   };
 
+  const [isCourseParticipant, setIsCourseParticipant] = useState(false);
+
+  useEffect(() => {
+    try {
+      const user = localStorage.getItem('sql_course_user');
+      if (user) {
+        setIsCourseParticipant(true);
+      }
+    } catch {}
+  }, []);
+
   return (
     <>
       <header
@@ -80,6 +91,27 @@ export const Header: React.FC = () => {
           >
             Categories
           </Link>
+          {isCourseParticipant ? (
+            <Link
+              href="/sql-course/dashboard"
+              className="px-3 py-2 rounded-xl text-accent font-bold hover:bg-accent/10 transition-all duration-200 flex items-center gap-1.5"
+            >
+              <span>Dashboard</span>
+              <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-500 text-white leading-none">
+                Active
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/sql-course"
+              className="px-3 py-2 rounded-xl text-accent font-bold hover:bg-accent/10 transition-all duration-200 flex items-center gap-1.5"
+            >
+              <span>SQL Course</span>
+              <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded-md bg-accent text-white leading-none">
+                Free
+              </span>
+            </Link>
+          )}
           
           {/* Theme Toggle Button */}
           <button
