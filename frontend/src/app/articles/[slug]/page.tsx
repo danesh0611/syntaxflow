@@ -7,6 +7,7 @@ import dynamicImport from 'next/dynamic';
 import { getBaseUrl } from '@/lib/utils';
 import { SqlCourseArticleGate } from '@/components/sql-course/SqlCourseArticleGate';
 import { MarkAsReadButton } from '@/components/MarkAsReadButton';
+import { HtmlArticleRenderer } from '@/components/HtmlArticleRenderer';
 
 const RichContent = dynamicImport(
   () => import('@/components/RichContent').then((mod) => mod.RichContent),
@@ -219,68 +220,71 @@ export default async function ArticlePage({ params }: PageProps) {
         </nav>
 
         <article className="relative">
-          {/* Cover Image */}
-          {article.coverImage && (
-            <div className="mb-10 rounded-2xl overflow-hidden aspect-video max-h-[440px] border border-card-border shadow-xl shadow-black/10">
-              <img
-                src={article.coverImage}
-                alt={article.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
+          {article.contentType !== 'html' && (
+            <>
+              {/* Cover Image */}
+              {article.coverImage && (
+                <div className="mb-10 rounded-2xl overflow-hidden aspect-video max-h-[440px] border border-card-border shadow-xl shadow-black/10">
+                  <img
+                    src={article.coverImage}
+                    alt={article.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
 
-          {/* Article Header */}
-          <header className="mb-8">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="text-xs font-bold text-accent tracking-wider uppercase bg-accent/10 border border-accent/25 px-2.5 py-1 rounded-lg">
-                {article.category}
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-6 leading-tight text-foreground">
-              {article.title}
-            </h1>
-            <div className="flex items-center gap-3 text-sm text-muted border-b border-card-border/60 pb-6">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/30 to-accent-2/30 border border-accent/25 flex items-center justify-center text-[10px] font-black text-accent flex-shrink-0">
-                {article.author.slice(0, 2).toUpperCase()}
-              </div>
-              <div>
-                <span className="font-semibold text-foreground">{article.author}</span>
-                <span className="mx-2 text-muted/50">·</span>
-                <time dateTime={article.createdAt}>{formattedDate}</time>
-              </div>
-            </div>
-          </header>
+              {/* Article Header */}
+              <header className="mb-8">
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="text-xs font-bold text-accent tracking-wider uppercase bg-accent/10 border border-accent/25 px-2.5 py-1 rounded-lg">
+                    {article.category}
+                  </span>
+                </div>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-6 leading-tight text-foreground">
+                  {article.title}
+                </h1>
+                <div className="flex items-center gap-3 text-sm text-muted border-b border-card-border/60 pb-6">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/30 to-accent-2/30 border border-accent/25 flex items-center justify-center text-[10px] font-black text-accent flex-shrink-0">
+                    {article.author.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <span className="font-semibold text-foreground">{article.author}</span>
+                    <span className="mx-2 text-muted/50">·</span>
+                    <time dateTime={article.createdAt}>{formattedDate}</time>
+                  </div>
+                </div>
+              </header>
 
-          {/* Excerpt */}
-          {article.excerpt && (
-            <div className="text-lg md:text-xl text-muted font-medium mb-10 pl-6 border-l-2 border-accent italic leading-relaxed">
-              {article.excerpt}
-            </div>
-          )}
+              {/* Excerpt */}
+              {article.excerpt && (
+                <div className="text-lg md:text-xl text-muted font-medium mb-10 pl-6 border-l-2 border-accent italic leading-relaxed">
+                  {article.excerpt}
+                </div>
+              )}
 
-          {/* Tags */}
-          {article.tags.filter(t => t.trim()).length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-10">
-              {article.tags.filter(tag => tag.trim()).map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs bg-card-bg border border-card-border text-muted px-3 py-1 rounded-lg"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
+              {/* Tags */}
+              {article.tags.filter((t) => t.trim()).length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-10">
+                  {article.tags
+                    .filter((tag) => tag.trim())
+                    .map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-xs bg-card-bg border border-card-border text-muted px-3 py-1 rounded-lg"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                </div>
+              )}
+            </>
           )}
 
           {/* Content (Gated for SQL course articles) */}
           <SqlCourseArticleGate isSqlCategory={article.category?.trim().toLowerCase() === 'sql'}>
-            <div className="article-content max-w-none mb-8 text-foreground/95 leading-relaxed">
+            <div className={`article-content max-w-none ${article.contentType === 'html' ? 'mb-2' : 'mb-8'} text-foreground/95 leading-relaxed`}>
               {article.contentType === 'html' && article.htmlContent ? (
-                <div
-                  className="custom-html-content space-y-6"
-                  dangerouslySetInnerHTML={{ __html: article.htmlContent }}
-                />
+                <HtmlArticleRenderer html={article.htmlContent} title={article.title} />
               ) : (
                 <RichContent value={article.content} />
               )}
