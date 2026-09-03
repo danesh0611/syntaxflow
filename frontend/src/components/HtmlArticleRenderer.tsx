@@ -25,7 +25,8 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
         header.top-nav, 
         #progress-bar, 
         .article-footer,
-        footer.article-footer {
+        footer.article-footer,
+        .stars-badge {
           display: none !important;
         }
         

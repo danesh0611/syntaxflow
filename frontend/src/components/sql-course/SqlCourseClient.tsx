@@ -14,7 +14,7 @@ const SAMPLE_SQL_SNIPPETS = [
   {
     title: 'Top N per Group',
     tag: 'Level 8: Window Functions (DENSE_RANK)',
-    difficulty: '⭐⭐⭐ High Yield',
+    difficulty: 'High Yield',
     interviewFor: 'Amazon / Google / Placement Drives',
     code: `WITH RankedSalaries AS (
   SELECT 
@@ -34,7 +34,7 @@ WHERE rnk <= 3;`,
   {
     title: 'INNER JOIN vs LEFT JOIN',
     tag: 'Level 4: Multi-Table Joins',
-    difficulty: '⭐⭐⭐ Core Placement',
+    difficulty: 'Core Placement',
     interviewFor: 'TCS / Infosys / Product Startups',
     code: `-- Fetch all customers and their orders (including customers without orders)
 SELECT 
@@ -48,7 +48,7 @@ LEFT JOIN orders o ON c.customer_id = o.customer_id;`,
   {
     title: 'Subquery with EXISTS',
     tag: 'Level 5: Subqueries',
-    difficulty: '⭐⭐⭐ High Yield',
+    difficulty: 'High Yield',
     interviewFor: 'Wipro / Cognizant / Tier-1 Tech',
     code: `-- Find all departments that have at least one active employee
 SELECT d.dept_id, d.dept_name
@@ -62,7 +62,7 @@ WHERE EXISTS (
   {
     title: 'Conditional Aggregation (CASE WHEN)',
     tag: 'Level 7: Conditional Queries',
-    difficulty: '⭐⭐ Interview Classic',
+    difficulty: 'Interview Classic',
     interviewFor: 'Analytics / SDE Placements',
     code: `SELECT 
   dept_id,
@@ -139,8 +139,8 @@ const CURRICULUM_LEVELS = [
     levelTag: 'Level 4',
     badgeColor: 'red',
     difficulty: 'Heavyweight',
-    starRating: '⭐⭐⭐',
-    title: 'Level 4 — JOINS ⭐⭐⭐',
+    starRating: '',
+    title: 'Level 4 — JOINS',
     description: 'The single most tested placement topic: linking tables, understanding row multiplication, and join types.',
     topics: [
       'What is a JOIN?',
@@ -158,8 +158,8 @@ const CURRICULUM_LEVELS = [
     levelTag: 'Level 5',
     badgeColor: 'red',
     difficulty: 'Heavyweight',
-    starRating: '⭐⭐⭐',
-    title: 'Level 5 — Subqueries ⭐⭐⭐',
+    starRating: '',
+    title: 'Level 5 — Subqueries',
     description: 'Nesting queries, filtering on aggregate results, correlated subqueries, and EXISTS vs IN comparisons.',
     topics: [
       'What is a subquery?',
@@ -204,8 +204,8 @@ const CURRICULUM_LEVELS = [
     levelTag: 'Level 8',
     badgeColor: 'red',
     difficulty: 'High Yield',
-    starRating: '⭐⭐⭐',
-    title: 'Level 8 — Window Functions ⭐⭐⭐',
+    starRating: '',
+    title: 'Level 8 — Window Functions',
     description: 'The #1 differentiator in placement and product company interviews. Calculating running metrics and Top-N rankings without collapsing rows.',
     topics: [
       'What are window functions?',
@@ -431,7 +431,7 @@ export const SqlCourseClient: React.FC = () => {
                 <div className="text-xs text-muted font-medium mt-0.5">Basics to Advanced</div>
               </div>
               <div className="p-3 rounded-xl bg-card-bg/40 border border-card-border/40">
-                <div className="text-2xl sm:text-3xl font-black text-rose-500">3 Star ⭐⭐⭐</div>
+                <div className="text-2xl sm:text-3xl font-black text-rose-500">High Yield</div>
                 <div className="text-xs text-muted font-medium mt-0.5">Joins & Window Funcs</div>
               </div>
               <div className="p-3 rounded-xl bg-card-bg/40 border border-card-border/40">
@@ -910,7 +910,7 @@ export const SqlCourseClient: React.FC = () => {
             <div className="p-6 rounded-2xl bg-card-bg border border-card-border">
               <h3 className="text-base font-bold text-foreground mb-2">Is this syllabus enough for placement drives?</h3>
               <p className="text-sm text-muted leading-relaxed">
-                Yes! The 9 levels cover all essential concepts (from SELECT and Aggregations up to JOINS ⭐⭐⭐, Subqueries ⭐⭐⭐, and Window Functions ⭐⭐⭐) asked in campus and off-campus placements.
+                Yes! The 9 levels cover all essential concepts (from SELECT and Aggregations up to JOINS, Subqueries, and Window Functions) asked in campus and off-campus placements.
               </p>
             </div>
 

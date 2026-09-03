@@ -178,7 +178,7 @@ export default async function ArticlePage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <Header />
-      <main className="max-w-4xl w-full mx-auto px-6 py-10 flex-1">
+      <main className="max-w-4xl w-full mx-auto px-3.5 sm:px-6 py-6 sm:py-10 flex-1">
 
         {/* BREADCRUMBS */}
         <nav aria-label="Breadcrumb" className="mb-8">
