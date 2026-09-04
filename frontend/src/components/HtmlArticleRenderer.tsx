@@ -13,11 +13,11 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const currentHeightRef = useRef<number>(800);
 
-  // Clean & prepare HTML document with isolated reset
+  // Clean & prepare HTML document with isolated reset and instant postMessage bridge
   const preparedHtml = React.useMemo(() => {
     if (!html) return '';
 
-    // Injected styles & theme sync: hide duplicate navbar/footer, prevent infinite scroll expansion, and sync dark/light theme
+    // Injected styles & high-speed bridge: hide duplicate navbar/footer, auto-resize, theme sync, and instant load signal
     const seamlessOverrides = `
       <style id="syntaxflow-seamless-overrides">
         /* Hide duplicate navbar, progress-bar, and standalone footer from embedded HTML */
@@ -36,7 +36,8 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
           padding: 0 !important;
           height: auto !important;
           min-height: auto !important;
-          overflow: hidden !important;
+          overflow-x: hidden !important;
+          overflow-y: hidden !important;
         }
         
         .article-layout {
@@ -71,11 +72,51 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
               }
             }
           }
+
+          function notifyParent() {
+            try {
+              var body = document.body;
+              var doc = document.documentElement;
+              var h = Math.ceil(Math.max(
+                body ? body.scrollHeight : 0,
+                doc ? doc.scrollHeight : 0,
+                body ? body.offsetHeight : 0,
+                doc ? doc.offsetHeight : 0
+              ));
+              if (h > 50) {
+                window.parent.postMessage({ type: 'SYNTAXFLOW_IFRAME_RESIZE', height: h }, '*');
+              }
+            } catch(e) {}
+          }
+
           window.addEventListener('message', function(event) {
             if (event.data && event.data.theme) {
               applyTheme(event.data.theme);
             }
           });
+
+          // Send immediate ready/dimensions
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', notifyParent);
+          } else {
+            notifyParent();
+          }
+
+          window.addEventListener('load', notifyParent);
+
+          // Observe DOM updates, accordions, simulator executions, etc.
+          if (typeof ResizeObserver !== 'undefined') {
+            var ro = new ResizeObserver(function() {
+              notifyParent();
+            });
+            if (document.body) {
+              ro.observe(document.body);
+            } else {
+              document.addEventListener('DOMContentLoaded', function() {
+                if (document.body) ro.observe(document.body);
+              });
+            }
+          }
         })();
       </script>
     `;
@@ -136,13 +177,15 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
       if (iframe.contentWindow && iframe.contentDocument) {
         const doc = iframe.contentDocument;
         const body = doc.body;
-        if (body) {
-          // Precise content measurement without recursive growth loops
+        const docEl = doc.documentElement;
+        if (body || docEl) {
           const measuredHeight = Math.ceil(
             Math.max(
-              body.getBoundingClientRect().height,
-              body.scrollHeight,
-              body.offsetHeight
+              body ? body.getBoundingClientRect().height : 0,
+              body ? body.scrollHeight : 0,
+              body ? body.offsetHeight : 0,
+              docEl ? docEl.scrollHeight : 0,
+              docEl ? docEl.offsetHeight : 0
             )
           );
 
@@ -153,61 +196,88 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
         }
       }
     } catch {
-      // Ignore
+      // Cross-origin fallback (ignore)
     }
   }, []);
 
+  const handleLoaded = useCallback(() => {
+    setIsLoaded(true);
+    updateHeight();
+
+    try {
+      const isDark = document.documentElement.classList.contains('dark');
+      iframeRef.current?.contentWindow?.postMessage({ theme: isDark ? 'dark' : 'light' }, '*');
+    } catch {}
+  }, [updateHeight]);
+
+  useEffect(() => {
+    // Listen to fast messages posted from inside iframe
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'SYNTAXFLOW_IFRAME_RESIZE') {
+        const measuredHeight = event.data.height;
+        if (typeof measuredHeight === 'number' && measuredHeight > 100) {
+          if (Math.abs(measuredHeight - currentHeightRef.current) > 3) {
+            currentHeightRef.current = measuredHeight;
+            setHeight(measuredHeight);
+          }
+          setIsLoaded(true);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    window.addEventListener('resize', updateHeight);
+
+    // Fast fallback timer: never block the user behind a long spinner
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+      updateHeight();
+    }, 120);
+
+    const checkTimer = setTimeout(() => {
+      updateHeight();
+    }, 400);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      window.removeEventListener('resize', updateHeight);
+      clearTimeout(timer);
+      clearTimeout(checkTimer);
+    };
+  }, [updateHeight]);
+
+  // Check if iframe is already ready on mount / html update
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
 
-    const handleLoad = () => {
-      setIsLoaded(true);
-      // Double check dimensions after rendering
-      updateHeight();
-      setTimeout(updateHeight, 150);
-      setTimeout(updateHeight, 600);
-
-      try {
-        const isDark = document.documentElement.classList.contains('dark');
-        iframe.contentWindow?.postMessage({ theme: isDark ? 'dark' : 'light' }, '*');
-      } catch {}
-
-      try {
-        const doc = iframe.contentDocument;
-        if (doc) {
-          doc.querySelectorAll('img, video, iframe').forEach((el) => {
-            el.addEventListener('load', updateHeight);
-          });
-        }
-      } catch {}
-    };
-
-    iframe.addEventListener('load', handleLoad);
-    window.addEventListener('resize', updateHeight);
-
-    return () => {
-      iframe.removeEventListener('load', handleLoad);
-      window.removeEventListener('resize', updateHeight);
-    };
-  }, [preparedHtml, updateHeight]);
+    if (
+      iframe.contentDocument &&
+      (iframe.contentDocument.readyState === 'complete' || iframe.contentDocument.readyState === 'interactive')
+    ) {
+      handleLoaded();
+    }
+  }, [preparedHtml, handleLoaded]);
 
   return (
-    <div className="w-full relative my-0 rounded-xl overflow-hidden bg-transparent">
+    <div className="w-full relative my-0 rounded-xl overflow-hidden bg-transparent transition-all duration-200">
+      {/* Subtle non-blocking top shimmer loader while initializing */}
       {!isLoaded && (
-        <div className="w-full h-80 flex flex-col items-center justify-center bg-card-bg/50 border border-card-border/60 rounded-2xl animate-pulse">
-          <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="text-sm font-medium text-muted">Loading interactive lesson...</p>
+        <div className="w-full h-40 flex flex-col items-center justify-center bg-card-bg/40 border border-card-border/40 rounded-2xl animate-pulse my-2">
+          <div className="w-8 h-8 border-3 border-accent border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-xs font-medium text-muted">Rendering lesson...</p>
         </div>
       )}
       <iframe
         ref={iframeRef}
         srcDoc={preparedHtml}
         title={title}
+        onLoad={handleLoaded}
         sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-        className={`w-full border-0 transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0 h-0'}`}
+        className={`w-full border-0 transition-opacity duration-200 ${isLoaded ? 'opacity-100' : 'opacity-0 absolute -top-[9999px] left-0 pointer-events-none'}`}
         style={{ height: `${height}px`, display: 'block', width: '100%' }}
       />
     </div>
   );
 }
+
