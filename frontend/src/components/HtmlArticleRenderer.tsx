@@ -17,7 +17,7 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
   const preparedHtml = React.useMemo(() => {
     if (!html) return '';
 
-    // Injected styles: hide duplicate navbar/footer and prevent infinite scroll expansion
+    // Injected styles & theme sync: hide duplicate navbar/footer, prevent infinite scroll expansion, and sync dark/light theme
     const seamlessOverrides = `
       <style id="syntaxflow-seamless-overrides">
         /* Hide duplicate navbar, progress-bar, and standalone footer from embedded HTML */
@@ -51,6 +51,33 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
           margin-bottom: 1.5rem !important;
         }
       </style>
+      <script>
+        (function() {
+          function applyTheme(theme) {
+            var isDark = theme === 'dark';
+            if (isDark) {
+              document.documentElement.classList.add('dark');
+              document.documentElement.classList.remove('light');
+              if (document.body) {
+                document.body.classList.add('dark');
+                document.body.classList.remove('light');
+              }
+            } else {
+              document.documentElement.classList.add('light');
+              document.documentElement.classList.remove('dark');
+              if (document.body) {
+                document.body.classList.add('light');
+                document.body.classList.remove('dark');
+              }
+            }
+          }
+          window.addEventListener('message', function(event) {
+            if (event.data && event.data.theme) {
+              applyTheme(event.data.theme);
+            }
+          });
+        })();
+      </script>
     `;
 
     const trimmed = html.trim();
@@ -140,6 +167,11 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
       updateHeight();
       setTimeout(updateHeight, 150);
       setTimeout(updateHeight, 600);
+
+      try {
+        const isDark = document.documentElement.classList.contains('dark');
+        iframe.contentWindow?.postMessage({ theme: isDark ? 'dark' : 'light' }, '*');
+      } catch {}
 
       try {
         const doc = iframe.contentDocument;

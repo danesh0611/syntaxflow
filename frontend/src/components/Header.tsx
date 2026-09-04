@@ -41,15 +41,24 @@ export const Header: React.FC = () => {
 
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    const isDark = nextTheme === 'dark';
     setTheme(nextTheme);
     localStorage.setItem('theme', nextTheme);
-    if (nextTheme === 'dark') {
+    if (isDark) {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
     } else {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
     }
+
+    document.querySelectorAll('iframe').forEach((iframe) => {
+      try {
+        iframe.contentWindow?.postMessage({ theme: isDark ? 'dark' : 'light' }, '*');
+      } catch (e) {
+        // ignore cross-origin errors
+      }
+    });
   };
 
   useEffect(() => {
