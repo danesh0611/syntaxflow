@@ -17,21 +17,38 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
   const preparedHtml = React.useMemo(() => {
     if (!html) return '';
 
-    // Injected styles & high-speed bridge: hide duplicate navbar/footer, auto-resize, theme sync, and instant load signal
+    // Injected styles & high-speed bridge: hide duplicate navbar/footer, auto-resize, and instant load signal
     const seamlessOverrides = `
       <style id="syntaxflow-seamless-overrides">
-        /* Hide duplicate navbar, progress-bar, and standalone footer from embedded HTML */
-        .top-nav, 
-        header.top-nav, 
+        /* Hide duplicate standalone footer and progress-bar */
         #progress-bar, 
         .article-footer,
         footer.article-footer,
         .stars-badge {
           display: none !important;
         }
+
+        /* Hide duplicate navbar, but preserve theme toggle button if inside it */
+        .top-nav, 
+        header.top-nav {
+          display: none !important;
+        }
+
+        /* If top-nav has a theme button, make sure the theme toggle remains visible */
+        .top-nav:has([class*="theme" i], [id*="theme" i], [aria-label*="theme" i], [aria-label*="dark" i]),
+        header.top-nav:has([class*="theme" i], [id*="theme" i], [aria-label*="theme" i], [aria-label*="dark" i]) {
+          display: flex !important;
+          justify-content: flex-end !important;
+          background: transparent !important;
+          border: none !important;
+          padding: 0.5rem 0 !important;
+          margin-bottom: 0.5rem !important;
+        }
+        .top-nav:has([class*="theme" i], [id*="theme" i], [aria-label*="theme" i], [aria-label*="dark" i]) > :not([class*="theme" i], [id*="theme" i], [aria-label*="theme" i], [aria-label*="dark" i], :has([class*="theme" i], [id*="theme" i], [aria-label*="theme" i], [aria-label*="dark" i])) {
+          display: none !important;
+        }
         
         html, body {
-          background-color: transparent !important;
           margin: 0 !important;
           padding: 0 !important;
           height: auto !important;
@@ -54,25 +71,6 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
       </style>
       <script>
         (function() {
-          function applyTheme(theme) {
-            var isDark = theme === 'dark';
-            if (isDark) {
-              document.documentElement.classList.add('dark');
-              document.documentElement.classList.remove('light');
-              if (document.body) {
-                document.body.classList.add('dark');
-                document.body.classList.remove('light');
-              }
-            } else {
-              document.documentElement.classList.add('light');
-              document.documentElement.classList.remove('dark');
-              if (document.body) {
-                document.body.classList.add('light');
-                document.body.classList.remove('dark');
-              }
-            }
-          }
-
           function notifyParent() {
             try {
               var body = document.body;
@@ -89,12 +87,6 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
             } catch(e) {}
           }
 
-          window.addEventListener('message', function(event) {
-            if (event.data && event.data.theme) {
-              applyTheme(event.data.theme);
-            }
-          });
-
           // Send immediate ready/dimensions
           if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', notifyParent);
@@ -104,7 +96,7 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
 
           window.addEventListener('load', notifyParent);
 
-          // Observe DOM updates, accordions, simulator executions, etc.
+          // Observe DOM updates, accordions, simulator executions, theme toggles, etc.
           if (typeof ResizeObserver !== 'undefined') {
             var ro = new ResizeObserver(function() {
               notifyParent();
@@ -136,14 +128,11 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root {
-      color-scheme: dark light;
-    }
     html, body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       line-height: 1.8;
-      color: #e2e8f0;
-      background-color: transparent;
+      color: #1e293b;
+      background-color: #ffffff;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -153,13 +142,13 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
       overflow: hidden !important;
     }
     img { max-width: 100%; height: auto; border-radius: 8px; }
-    pre { background: #0f172a; padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid rgba(255,255,255,0.1); }
+    pre { background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid rgba(0,0,0,0.1); }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.9em; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { border: 1px solid rgba(255,255,255,0.15); padding: 10px 14px; text-align: left; }
-    th { background: rgba(255,255,255,0.05); }
-    a { color: #60a5fa; text-decoration: underline; }
-    blockquote { border-left: 4px solid #3b82f6; margin: 16px 0; padding-left: 16px; color: #94a3b8; }
+    th, td { border: 1px solid rgba(0,0,0,0.15); padding: 10px 14px; text-align: left; }
+    th { background: rgba(0,0,0,0.05); }
+    a { color: #4f46e5; text-decoration: underline; }
+    blockquote { border-left: 4px solid #4f46e5; margin: 16px 0; padding-left: 16px; color: #64748b; }
   </style>
   ${seamlessOverrides}
 </head>
@@ -203,11 +192,6 @@ export function HtmlArticleRenderer({ html, title = 'Article Content' }: HtmlArt
   const handleLoaded = useCallback(() => {
     setIsLoaded(true);
     updateHeight();
-
-    try {
-      const isDark = document.documentElement.classList.contains('dark');
-      iframeRef.current?.contentWindow?.postMessage({ theme: isDark ? 'dark' : 'light' }, '*');
-    } catch {}
   }, [updateHeight]);
 
   useEffect(() => {

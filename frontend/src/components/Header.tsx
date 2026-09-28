@@ -51,14 +51,6 @@ export const Header: React.FC = () => {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
     }
-
-    document.querySelectorAll('iframe').forEach((iframe) => {
-      try {
-        iframe.contentWindow?.postMessage({ theme: isDark ? 'dark' : 'light' }, '*');
-      } catch (e) {
-        // ignore cross-origin errors
-      }
-    });
   };
 
   useEffect(() => {
