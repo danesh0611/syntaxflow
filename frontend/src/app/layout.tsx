@@ -99,6 +99,11 @@ export default function RootLayout({
     >
       <head>
         <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6003168106643942"
+          crossOrigin="anonymous"
+        />
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
