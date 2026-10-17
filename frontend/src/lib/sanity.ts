@@ -1,5 +1,5 @@
 import { createClient } from '@sanity/client';
-import imageUrlBuilder from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
@@ -16,7 +16,7 @@ export const sanityClient = isSanityConfigured
     })
   : null;
 
-const imageBuilder = sanityClient ? imageUrlBuilder(sanityClient) : null;
+const imageBuilder = sanityClient ? createImageUrlBuilder(sanityClient) : null;
 
 export const sanityStudioUrl = process.env.NEXT_PUBLIC_SANITY_STUDIO_URL || 'http://localhost:3333';
 
