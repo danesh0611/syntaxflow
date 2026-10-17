@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { GoogleSignInButton } from '@/components/GoogleSignInButton';
 
 export const SqlCourseLoginClient: React.FC = () => {
   const router = useRouter();
@@ -199,6 +200,28 @@ export const SqlCourseLoginClient: React.FC = () => {
                     )}
                   </div>
                 )}
+
+                {/* Google Sign In Button */}
+                <div className="space-y-4 mb-6">
+                  <GoogleSignInButton
+                    text="signin_with"
+                    onSuccess={(user) => {
+                      if (typeof window !== 'undefined') {
+                        localStorage.setItem('sql_course_user', JSON.stringify(user));
+                      }
+                      router.push('/sql-course/dashboard');
+                    }}
+                    onError={(err) => setErrorMessage(err)}
+                  />
+
+                  <div className="relative flex items-center justify-center">
+                    <div className="border-t border-card-border/80 w-full" />
+                    <span className="bg-card-bg px-3 text-[10px] font-bold text-muted uppercase tracking-widest relative">
+                      Or with email password
+                    </span>
+                    <div className="border-t border-card-border/80 w-full" />
+                  </div>
+                </div>
 
                 <form onSubmit={handleLogin} className="space-y-5">
                   <div>

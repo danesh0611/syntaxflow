@@ -99,6 +99,15 @@ export const Header: React.FC = () => {
             >
               Categories
             </Link>
+            <Link
+              href="/dsa-sheet"
+              className="px-3.5 py-2 rounded-xl text-foreground font-semibold hover:bg-card-border/30 transition-all duration-200 flex items-center gap-1.5"
+            >
+              <span>DSA Sheet</span>
+              <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-accent to-accent-2 text-white leading-none shadow-sm shadow-accent/25">
+                New
+              </span>
+            </Link>
             {isCourseParticipant ? (
               <Link
                 href="/sql-course/dashboard"
@@ -227,6 +236,19 @@ export const Header: React.FC = () => {
             >
               <span>Categories</span>
               <span className="text-xs text-muted">All Topics</span>
+            </Link>
+
+            <Link
+              href="/dsa-sheet"
+              className="flex items-center justify-between px-4 py-3 rounded-xl font-bold text-foreground bg-card-bg/50 border border-card-border/50 hover:bg-card-border/30 transition"
+            >
+              <div className="flex items-center gap-2">
+                <span>DSA Sheet & Tracker</span>
+                <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded-md bg-accent text-white">
+                  100 FAANG
+                </span>
+              </div>
+              <span className="text-xs text-muted">Practice</span>
             </Link>
 
             {isCourseParticipant ? (

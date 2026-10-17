@@ -128,6 +128,14 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/dsa-sheet" className="text-foreground font-semibold hover:text-accent hover:translate-x-1 inline-flex items-center gap-1.5 transition-all duration-200">
+                  <span>DSA Sheet & Tracker</span>
+                  <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.2 rounded bg-gradient-to-r from-accent to-accent-2 text-white">
+                    100 FAANG
+                  </span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/sql-course" className="text-accent font-semibold hover:text-accent-2 hover:translate-x-1 inline-flex items-center gap-1.5 transition-all duration-200">
                   <span>SQL Course</span>
                   <span className="text-[9px] uppercase font-extrabold px-1.5 py-0.2 rounded bg-accent/20 text-accent">
