@@ -19,7 +19,6 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
   const [searchFilter, setSearchFilter] = useState<string>('');
   const directoryRef = useRef<HTMLElement>(null);
   const dsaSectionRef = useRef<HTMLElement>(null);
-  const engineeringSectionRef = useRef<HTMLElement>(null);
 
   const handleCategorySelect = (cat: string) => {
     setSelectedCategory(cat);
@@ -51,17 +50,20 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
     );
   }, [dsaArticles, activeDsaFilter]);
 
-  // 2. Core Engineering Subjects (Wireless, SDR, Hardware)
-  const engineeringArticles = useMemo(() => {
+  // 2. Core Engineering Subjects Highlight (Only 2 articles shown on homepage)
+  const coreEngineeringSpotlight = useMemo(() => {
     return initialArticles.filter(
       (a) =>
         (a.category?.toLowerCase().includes('wireless') ||
+        a.category?.toLowerCase().includes('automata') ||
+        a.category?.toLowerCase().includes('formal language') ||
         a.category?.toLowerCase().includes('system') ||
-        /sdr|frequency|synthesizer|receiver|ash|superheterodyne/i.test(a.title)) &&
+        /sdr|frequency|synthesizer|receiver|ash|superheterodyne|automata/i.test(a.title)) &&
         !(a.category?.toLowerCase().includes('data structure') ||
         a.category?.toLowerCase().includes('algorithm') ||
+        a.category?.toLowerCase().includes('dsa') ||
         a.tags?.some((t) => /dsa|leetcode/i.test(t)))
-    );
+    ).slice(0, 2);
   }, [initialArticles]);
 
   // 3. Python & Machine Learning
@@ -83,7 +85,7 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
       (a) =>
         (a.category?.toLowerCase().includes('global') ||
         a.category?.toLowerCase().includes('projects') ||
-        /scam|layoffs|profitable|trust platform/i.test(a.title)) &&
+        /scam|layoffs|profitable|trust platform|outage|outlook/i.test(a.title)) &&
         !(a.category?.toLowerCase().includes('data structure') ||
         a.category?.toLowerCase().includes('algorithm') ||
         a.tags?.some((t) => /dsa|leetcode/i.test(t)))
@@ -212,28 +214,26 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
               </div>
             </button>
 
-            {/* Tool 4: Core Subjects & Tech */}
-            <button
-              onClick={() => {
-                engineeringSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className="group p-4 sm:p-5 rounded-xl bg-card-bg border border-card-border hover:border-amber-500/30 hover:-translate-y-1 hover:shadow-md text-left transition-all duration-200 flex flex-col justify-between cursor-pointer"
+            {/* Tool 4: Core Subjects (Opens Dedicated Page with SRW & FLA) */}
+            <Link
+              href="/core-subjects"
+              className="group p-4 sm:p-5 rounded-xl bg-card-bg border border-card-border hover:border-amber-500/30 hover:-translate-y-1 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <span className="font-mono text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase">
-                    CORE
+                    SUBJECTS
                   </span>
-                  <span className="text-muted group-hover:text-amber-500 group-hover:translate-y-1 transition-all text-xs font-bold">&darr;</span>
+                  <span className="text-muted group-hover:text-amber-500 group-hover:translate-x-1 transition-all text-xs font-bold">&rarr;</span>
                 </div>
                 <h3 className="text-sm font-semibold text-foreground group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                  Engineering Subjects
+                  Core Subjects
                 </h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
-                  Wireless Communications, SDR, RF Synthesizers, Signals, and Python essentials.
+                  Dedicated hub for SRW (Wireless) and FLA (Automata Theory) guides.
                 </p>
               </div>
-            </button>
+            </Link>
           </div>
         </section>
 
@@ -321,25 +321,38 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
           </div>
         </section>
 
-        {/* ── 3. SECTION: CORE ENGINEERING SEMESTER SUBJECTS ──────────── */}
-        <section ref={engineeringSectionRef} className="mb-12 sm:mb-16" style={{ scrollMarginTop: '80px' }}>
-          <div className="border-b border-card-border pb-4 mb-6">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-              <span className="font-mono text-xs uppercase tracking-wider text-muted">
-                Semester Subjects &middot; Core Hardware
-              </span>
+        {/* ── 3. SECTION: CORE SUBJECTS SPOTLIGHT (ONLY 1 OR 2 ARTICLES + BUTTON TO NEW PAGE) ──── */}
+        <section className="mb-12 sm:mb-16">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-card-border pb-4 mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                <span className="font-mono text-xs uppercase tracking-wider text-muted">
+                  University Curriculum &middot; Core Engineering
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                Core Subjects
+              </h2>
+              <p className="text-xs sm:text-sm text-muted mt-1 max-w-xl">
+                Dedicated curriculum for Short Range Wireless (SRW) and Formal Languages &amp; Automata Theory (FLA).
+              </p>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-              Wireless Communications &amp; Systems Architecture
-            </h2>
-            <p className="text-xs sm:text-sm text-muted mt-1 max-w-xl">
-              Visual study guides and technical breakdowns for semester exams and electronics/embedded interviews.
-            </p>
+
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <Link
+                href="/core-subjects"
+                className="px-4 py-2 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 hover:-translate-y-0.5 active:scale-98 transition-all flex items-center gap-1.5 shadow-xs"
+              >
+                <span>View Core Subjects (SRW &amp; FLA)</span>
+                <span>&rarr;</span>
+              </Link>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {engineeringArticles.slice(0, 4).map((article, i) => (
+          {/* 1-2 Highlighted Core Articles */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {coreEngineeringSpotlight.map((article, i) => (
               <ArticleCard key={article.id} article={article} index={i} />
             ))}
           </div>
