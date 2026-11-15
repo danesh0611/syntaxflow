@@ -20,6 +20,8 @@ type SanityArticleDoc = {
   title: string;
   slug?: { current?: string };
   excerpt?: string;
+  contentType?: 'richText' | 'html';
+  htmlContent?: string;
   body?: Article['content'];
   author?: string;
   tags?: string[];
@@ -50,6 +52,8 @@ const articleProjection = `
   title,
   slug,
   excerpt,
+  contentType,
+  htmlContent,
   body,
   author,
   tags,
@@ -111,6 +115,8 @@ const mapArticle = (doc: SanityArticleDoc): Article => {
     slug,
     excerpt: cleanArticleExcerpt(doc.excerpt, slug, title),
     content: doc.body || '',
+    contentType: doc.contentType || 'richText',
+    htmlContent: doc.htmlContent || '',
     category: doc.category?.title || 'General News',
     author: doc.author || 'Editorial',
     coverImage: doc.mainImage?.asset?.url || '',
@@ -159,6 +165,7 @@ export async function GET(request: Request) {
           title match $searchTerm ||
           excerpt match $searchTerm ||
           pt::text(body) match $searchTerm ||
+          htmlContent match $searchTerm ||
           category->title match $searchTerm ||
           tags[] match $searchTerm
         )] | order(publishedAt desc) {${articleProjection}}`,

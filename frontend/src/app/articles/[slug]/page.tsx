@@ -219,7 +219,7 @@ export default async function ArticlePage({ params }: PageProps) {
           </ol>
         </nav>
 
-        <article className="relative">
+        <article className="relative" data-article-title={article.title}>
           {article.contentType !== 'html' && (
             <>
               {/* Cover Image */}

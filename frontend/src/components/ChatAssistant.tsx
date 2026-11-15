@@ -44,20 +44,46 @@ export default function ChatAssistant() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
+  const extractArticleContext = (): { title: string; content: string } => {
+    if (typeof window === 'undefined' || !pathname.startsWith('/articles/')) {
+      return { title: '', content: '' };
+    }
+
+    const articleEl = document.querySelector('article');
+    const titleEl = document.querySelector('article h1') || document.querySelector('h1');
+    const title = articleEl?.getAttribute('data-article-title') || titleEl?.textContent?.trim() || '';
+
+    const contentContainer = document.querySelector('.article-content') || articleEl;
+    let content = '';
+
+    // If rendered as an HTML article inside an iframe
+    const iframe = contentContainer?.querySelector('iframe') as HTMLIFrameElement | null;
+    if (iframe) {
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc && iframeDoc.body) {
+          content = iframeDoc.body.innerText?.trim() || iframeDoc.body.textContent?.trim() || '';
+        }
+      } catch (e) {
+        console.warn('Could not read iframe contents:', e);
+      }
+    }
+
+    // Fallback to textContent for rich-text articles
+    if (!content && contentContainer) {
+      content = contentContainer.textContent?.trim() || '';
+    }
+
+    return { title, content };
+  };
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const timer = setTimeout(() => {
-        if (pathname.startsWith('/articles/')) {
-          const titleEl = document.querySelector('article h1');
-          const contentEl = document.querySelector('.article-content');
-
-          setContextTitle(titleEl?.textContent?.trim() || '');
-          setContextContent(contentEl?.textContent?.trim() || '');
-        } else {
-          setContextTitle('');
-          setContextContent('');
-        }
-      }, 500);
+        const { title, content } = extractArticleContext();
+        setContextTitle(title);
+        setContextContent(content);
+      }, 700);
 
       return () => clearTimeout(timer);
     }
@@ -74,19 +100,9 @@ export default function ChatAssistant() {
       timestamp,
     };
 
-    let activeTitle = contextTitle;
-    let activeContent = contextContent;
-
-    if (typeof window !== 'undefined' && pathname.startsWith('/articles/')) {
-      const titleEl = document.querySelector('article h1') || document.querySelector('h1');
-      const contentEl = document.querySelector('.article-content') || document.querySelector('article');
-
-      activeTitle = titleEl?.textContent?.trim() || '';
-      activeContent = contentEl?.textContent?.trim() || '';
-
-      setContextTitle(activeTitle);
-      setContextContent(activeContent);
-    }
+    const { title: activeTitle, content: activeContent } = extractArticleContext();
+    if (activeTitle) setContextTitle(activeTitle);
+    if (activeContent) setContextContent(activeContent);
 
     const updatedMessages = [...messages, userMessage];
     saveChatHistory(updatedMessages);

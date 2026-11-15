@@ -158,6 +158,7 @@ export const contentSource = {
             title match $searchTerm ||
             excerpt match $searchTerm ||
             pt::text(body) match $searchTerm ||
+            htmlContent match $searchTerm ||
             category->title match $searchTerm ||
             tags[] match $searchTerm
           )] | order(publishedAt desc) {${articleProjection}}`,
