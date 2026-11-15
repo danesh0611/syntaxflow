@@ -110,16 +110,13 @@ export const Header: React.FC = () => {
             {/* Core Subjects Link */}
             <Link
               href="/core-subjects"
-              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                 pathname === '/core-subjects'
                   ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
                   : 'hover:text-foreground hover:bg-card-border/30'
               }`}
             >
-              <span>Core Subjects</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded border border-card-border bg-card-bg text-muted-foreground">
-                SRW &amp; FLA
-              </span>
+              Core Subjects
             </Link>
             <Link
               href="/dsa-sheet"
@@ -269,13 +266,8 @@ export const Header: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-card-border/30 transition-colors"
             >
-              <div className="flex items-center gap-2">
-                <span>Core Engineering Subjects</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                  SRW &amp; FLA
-                </span>
-              </div>
-              <span className="text-xs text-muted">&rarr;</span>
+              <span>Core Subjects</span>
+              <span className="text-xs text-muted">SRW &amp; FLA &rarr;</span>
             </Link>
 
             <Link
