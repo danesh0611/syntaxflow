@@ -6,59 +6,97 @@ interface ArticleCardProps {
   article: Article;
   featured?: boolean;
   index?: number;
+  variant?: 'card' | 'row';
 }
 
-export const ArticleCard: React.FC<ArticleCardProps> = ({ article, index = 0 }) => {
+export const ArticleCard: React.FC<ArticleCardProps> = ({
+  article,
+  index = 0,
+  variant = 'card',
+}) => {
   const formattedDate = new Date(article.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   });
 
+  if (variant === 'row') {
+    return (
+      <article className="group py-3.5 px-4 rounded-xl border border-card-border/60 hover:border-card-border hover:bg-card-bg/80 transition-all duration-150 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card-bg/40">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-accent bg-accent/8 border border-accent/20 px-1.5 py-0.2 rounded">
+              {article.category}
+            </span>
+            <span className="text-[11px] font-mono text-muted">{formattedDate}</span>
+          </div>
+          <h3 className="text-sm font-bold text-foreground group-hover:text-accent transition-colors truncate">
+            <Link href={`/articles/${article.slug}`}>{article.title}</Link>
+          </h3>
+          {article.excerpt && (
+            <p className="text-xs text-muted line-clamp-1 mt-0.5">{article.excerpt}</p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-3 flex-shrink-0 sm:self-center">
+          <span className="text-xs text-muted hidden md:inline-block">{article.author}</span>
+          <Link
+            href={`/articles/${article.slug}`}
+            className="text-xs font-semibold text-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1"
+          >
+            <span>Read</span>
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </Link>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article
-      className="card-glow group relative flex flex-col h-full bg-card-bg border border-card-border rounded-[1.125rem] overflow-hidden animate-fade-up"
-      style={{ animationDelay: `${index * 80}ms` }}
+      className="group relative flex flex-col h-full bg-card-bg border border-card-border hover:border-card-border-hover rounded-xl overflow-hidden transition-all duration-200 shadow-xs hover:shadow-sm hover:-translate-y-0.5 animate-fade-up"
+      style={{ animationDelay: `${index * 30}ms` }}
     >
       {/* Cover Image */}
       {article.coverImage ? (
-        <div className="relative aspect-video w-full overflow-hidden bg-card-bg">
+        <div className="relative aspect-video w-full overflow-hidden bg-neutral-900 border-b border-card-border">
           <img
             src={article.coverImage}
             alt={article.title}
-            className="w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-700 ease-out"
+            className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 ease-out"
           />
-          {/* Gradient overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
       ) : (
-        <div className="relative aspect-video w-full overflow-hidden flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #0d1035 0%, #1a0a2e 50%, #0d1035 100%)' }}
-        >
-          {/* Ambient blobs in placeholder */}
-          <div className="absolute w-24 h-24 rounded-full opacity-20 blur-2xl"
-            style={{ background: 'radial-gradient(circle, #6366f1, transparent)', top: '20%', left: '20%' }} />
-          <div className="absolute w-20 h-20 rounded-full opacity-15 blur-2xl"
-            style={{ background: 'radial-gradient(circle, #8b5cf6, transparent)', bottom: '20%', right: '20%' }} />
-          <span className="relative text-xs font-black tracking-[0.3em] uppercase text-indigo-400/50">
-            SyntaxFlow
-          </span>
+        <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-[#0e1117] to-[#151922] p-4 flex flex-col justify-between border-b border-card-border text-slate-400 font-mono select-none">
+          <div className="flex items-center justify-between text-[10px] text-slate-500">
+            <span>SYNTAXFLOW</span>
+            <span className="uppercase">{article.category}</span>
+          </div>
+          <div className="text-xs font-sans font-bold text-slate-300 line-clamp-2">
+            {article.title}
+          </div>
+          <div className="text-[10px] text-slate-500">
+            ENTRY // 0{index + 1}
+          </div>
         </div>
       )}
 
       <div className="flex flex-col flex-1 p-5">
-        {/* Category */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-[11px] font-bold text-accent tracking-wider uppercase bg-accent/10 border border-accent/20 px-2.5 py-1 rounded-lg">
+        {/* Category & Date */}
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-accent bg-accent/8 border border-accent/20 px-2 py-0.5 rounded">
             {article.category}
           </span>
+          <span className="text-[11px] font-mono text-muted">{formattedDate}</span>
         </div>
 
         {/* Title */}
-        <h2 className="text-base font-bold mb-3 line-clamp-2 leading-snug tracking-tight">
+        <h2 className="text-base font-bold mb-2.5 line-clamp-2 leading-snug tracking-tight">
           <Link
             href={`/articles/${article.slug}`}
-            className="text-foreground hover:text-accent transition-colors duration-300"
+            className="text-foreground hover:text-accent transition-colors duration-150"
           >
             {article.title}
           </Link>
@@ -70,30 +108,42 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, index = 0 }) 
         </p>
 
         {/* Tags */}
-        {article.tags.filter(t => t.trim()).length > 0 && (
+        {article.tags.filter((t) => t.trim()).length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {article.tags.filter(t => t.trim()).slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className="text-[10px] font-medium text-muted bg-card-border/60 border border-card-border px-2 py-0.5 rounded-md"
-              >
-                #{tag}
-              </span>
-            ))}
+            {article.tags
+              .filter((t) => t.trim())
+              .slice(0, 2)
+              .map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] font-mono text-muted bg-card-border/30 border border-card-border/60 px-1.5 py-0.5 rounded"
+                >
+                  #{tag}
+                </span>
+              ))}
           </div>
         )}
 
         {/* Meta footer */}
-        <div className="pt-3.5 border-t border-card-border/50 flex items-center justify-between gap-3">
+        <div className="pt-3 border-t border-card-border/60 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent/30 to-accent-2/30 border border-accent/25 flex items-center justify-center text-[10px] font-black text-accent flex-shrink-0">
+            <div className="w-6 h-6 rounded-full bg-card-border flex items-center justify-center text-[10px] font-mono font-bold text-foreground flex-shrink-0">
               {article.author.slice(0, 2).toUpperCase()}
             </div>
-            <span className="text-xs font-semibold text-foreground/80 truncate max-w-[100px]">
+            <span className="text-xs font-medium text-foreground truncate max-w-[120px]">
               {article.author}
             </span>
           </div>
-          <span className="text-[11px] text-muted flex-shrink-0">{formattedDate}</span>
+
+          <Link
+            href={`/articles/${article.slug}`}
+            className="text-xs font-semibold text-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1"
+          >
+            <span>Read</span>
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </Link>
         </div>
       </div>
     </article>

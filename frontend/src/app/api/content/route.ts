@@ -83,22 +83,45 @@ const parseKeywords = (keywordsInput: any): string[] => {
   return [];
 };
 
-const mapArticle = (doc: SanityArticleDoc): Article => ({
-  id: doc._id,
-  title: doc.title,
-  slug: doc.slug?.current || doc._id,
-  excerpt: doc.excerpt || '',
-  content: doc.body || '',
-  category: doc.category?.title || 'General News',
-  author: doc.author || 'Editorial',
-  coverImage: doc.mainImage?.asset?.url || '',
-  tags: doc.tags || [],
-  keywords: parseKeywords(doc.keywords),
-  published: true,
-  views: 0,
-  createdAt: doc.publishedAt || doc._createdAt,
-  updatedAt: doc._updatedAt,
-});
+const cleanArticleTitle = (title: string): string => {
+  if (!title) return '';
+  return title
+    .replace(/\s*Alternative:\s*$/i, '')
+    .replace(/Chapter 2:Mastering/i, 'Chapter 2: Mastering')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+};
+
+const cleanArticleExcerpt = (excerpt: string | undefined, slug: string, title: string): string => {
+  if (slug === 'project-1' || /scam\s*gurad/i.test(excerpt || '')) {
+    return 'An AI-powered digital trust and fraud prevention platform built with Google Gemini to identify social engineering scams and deceptive payment requests in real time.';
+  }
+  if (!excerpt || excerpt.trim().length === 0) {
+    return `In-depth technical breakdown and implementation walkthrough for ${cleanArticleTitle(title)}.`;
+  }
+  return excerpt.trim();
+};
+
+const mapArticle = (doc: SanityArticleDoc): Article => {
+  const slug = doc.slug?.current || doc._id;
+  const title = cleanArticleTitle(doc.title);
+  return {
+    id: doc._id,
+    title,
+    slug,
+    excerpt: cleanArticleExcerpt(doc.excerpt, slug, title),
+    content: doc.body || '',
+    category: doc.category?.title || 'General News',
+    author: doc.author || 'Editorial',
+    coverImage: doc.mainImage?.asset?.url || '',
+    tags: doc.tags || [],
+    keywords: parseKeywords(doc.keywords),
+    published: true,
+    views: 0,
+    createdAt: doc.publishedAt || doc._createdAt,
+    updatedAt: doc._updatedAt,
+  };
+};
 
 export async function GET(request: Request) {
   if (!sanityClient) {

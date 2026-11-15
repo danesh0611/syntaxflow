@@ -419,17 +419,17 @@ export default function DsaSheetClient() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Auth Notice Banner for Guest Users */}
         {!user && (
-          <div className="rounded-2xl border border-accent/30 bg-gradient-to-r from-accent/10 via-accent-2/10 to-transparent p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md shadow-accent/5">
+          <div className="rounded-xl border border-card-border bg-card-bg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
             <div className="flex items-center gap-3">
-              <span className="w-9 h-9 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
+              <span className="w-8 h-8 rounded-lg bg-card-border flex items-center justify-center font-bold text-sm flex-shrink-0">
                 🔒
               </span>
               <div>
-                <h2 className="text-sm font-extrabold text-foreground">
-                  Guest Browsing Mode — Progress Tracking Requires Free Login
+                <h2 className="text-xs sm:text-sm font-bold text-foreground">
+                  Guest Browsing Mode &mdash; Progress Tracking Requires Free Login
                 </h2>
                 <p className="text-xs text-muted">
-                  You can explore all 100 questions and read tutorials. To manually tick solved problems, save notes, or
+                  Explore all 100 questions and read tutorials. To manually tick solved problems, save notes, or
                   view your live LeetCode stats dashboard, sign in to your free account.
                 </p>
               </div>
@@ -440,31 +440,29 @@ export default function DsaSheetClient() {
                 setAuthReason('track your progress and save your solved problems');
                 setShowAuthModal(true);
               }}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-accent text-white hover:bg-accent/90 active:scale-95 transition-all shadow-md shadow-accent/20 flex-shrink-0 whitespace-nowrap"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 active:scale-98 transition-all flex-shrink-0 whitespace-nowrap cursor-pointer"
             >
-              Log In / Register Free →
+              Sign In / Register Free &rarr;
             </button>
           </div>
         )}
 
         {/* Hero Section */}
-        <div className="relative overflow-hidden rounded-3xl border border-card-border/70 bg-gradient-to-br from-card-bg via-card-bg to-accent/5 p-6 sm:p-10 shadow-xl shadow-accent/5">
-          <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="rounded-xl border border-card-border bg-card-bg p-6 sm:p-8 shadow-xs">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="max-w-2xl space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold uppercase tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded font-mono text-xs font-medium text-accent bg-accent/8 border border-accent/20 uppercase tracking-wider">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   100 Curated FAANG DSA Sheet
                 </div>
 
                 {user ? (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
-                    <span>👤</span>
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded font-mono text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
                     <span>Tracking active: {user.name}</span>
                     <button
                       onClick={handleLogout}
-                      className="ml-1 text-[10px] uppercase font-bold text-muted hover:text-rose-500 underline"
+                      className="ml-1 uppercase text-[10px] text-muted hover:text-rose-500 underline"
                     >
                       Logout
                     </button>
@@ -475,30 +473,29 @@ export default function DsaSheetClient() {
                       setAuthReason('enable progress tracking');
                       setShowAuthModal(true);
                     }}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold hover:bg-amber-500/20 transition-colors"
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded font-mono text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-colors cursor-pointer"
                   >
-                    <span>🔒</span>
                     <span>Sign in to save progress</span>
                   </button>
                 )}
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
-                Master DSA with <span className="gradient-text">Manual Checklist Tracking</span> & LeetCode Analytics
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight text-foreground">
+                Master DSA with Manual Checklist Tracking &amp; LeetCode Analytics
               </h1>
               <p className="text-muted text-sm sm:text-base leading-relaxed">
-                Check off solved questions at your own pace, explore in-depth tutorials with code & dry-runs, and view an
+                Check off solved questions at your own pace, explore in-depth tutorials with code &amp; dry-runs, and view an
                 interactive dashboard of your live LeetCode stats, activity velocity, and practice feed.
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="flex flex-wrap items-center gap-2.5 pt-1">
                 <button
                   id="copy-checklist-btn"
                   onClick={handleCopyChecklist}
-                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-accent text-white hover:bg-accent/90 active:scale-95 transition-all shadow-md shadow-accent/20 flex items-center gap-2"
+                  className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 active:scale-98 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -511,9 +508,9 @@ export default function DsaSheetClient() {
                 <button
                   id="pick-random-btn"
                   onClick={handlePickRandom}
-                  className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-card-bg border border-card-border hover:border-accent text-foreground hover:text-accent active:scale-95 transition-all shadow-sm flex items-center gap-2"
+                  className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-card-bg border border-card-border hover:border-card-border-hover text-foreground active:scale-98 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -526,7 +523,7 @@ export default function DsaSheetClient() {
                 {leetcodeProfile && (
                   <button
                     onClick={() => setShowLeetCodeDashboard(!showLeetCodeDashboard)}
-                    className="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[#FFA116]/10 border border-[#FFA116]/30 text-[#FFA116] hover:bg-[#FFA116]/20 transition-all flex items-center gap-1.5"
+                    className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-[#FFA116]/10 border border-[#FFA116]/30 text-[#FFA116] hover:bg-[#FFA116]/20 transition-all flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>📊</span>
                     <span>{showLeetCodeDashboard ? 'Hide LeetCode Stats' : 'View LeetCode Stats'}</span>
@@ -537,7 +534,7 @@ export default function DsaSheetClient() {
                   <button
                     id="reset-progress-btn"
                     onClick={handleResetClick}
-                    className="px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors"
+                    className="px-3 py-2 rounded-lg text-xs font-medium text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
                   >
                     Reset Progress
                   </button>
@@ -546,18 +543,18 @@ export default function DsaSheetClient() {
             </div>
 
             {/* LeetCode Profile Connector Mini-Card */}
-            <div className="w-full lg:w-96 rounded-2xl bg-card-bg/90 border border-card-border p-5 shadow-lg backdrop-blur-md">
-              <div className="flex items-center justify-between pb-3 border-b border-card-border/60">
+            <div className="w-full lg:w-96 rounded-xl bg-background border border-card-border p-4 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-card-border">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-[#FFA116]/10 flex items-center justify-center font-bold text-[#FFA116]">
+                  <div className="w-6 h-6 rounded bg-[#FFA116]/10 flex items-center justify-center font-bold text-xs text-[#FFA116]">
                     LC
                   </div>
-                  <span className="font-bold text-sm">LeetCode Stats & Activity</span>
+                  <span className="font-bold text-xs text-foreground">LeetCode Stats &amp; Activity</span>
                 </div>
                 {user && leetcodeProfile && (
                   <button
                     onClick={handleDisconnectLeetCode}
-                    className="text-xs text-muted hover:text-rose-500 transition-colors"
+                    className="text-xs text-muted hover:text-rose-500 transition-colors cursor-pointer"
                   >
                     Disconnect
                   </button>

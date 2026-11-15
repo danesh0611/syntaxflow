@@ -368,79 +368,72 @@ export const SqlCourseClient: React.FC = () => {
       <Header />
 
       <main className="flex-1 overflow-hidden relative">
-        {/* Glow ambient background orbs */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-gradient-to-tr from-accent/20 via-accent-2/15 to-accent-3/15 blur-[120px] rounded-full pointer-events-none -z-10" />
-        <div className="absolute top-[800px] -left-40 w-[500px] h-[500px] bg-accent/10 blur-[140px] rounded-full pointer-events-none -z-10" />
-        <div className="absolute top-[1400px] -right-40 w-[500px] h-[500px] bg-accent-2/10 blur-[140px] rounded-full pointer-events-none -z-10" />
-
         {/* ------------------------------------------------------------- */}
         {/* HERO SECTION */}
         {/* ------------------------------------------------------------- */}
-        <section className="relative pt-12 pb-20 px-6 max-w-6xl mx-auto">
+        <section className="relative pt-12 pb-16 px-4 sm:px-6 max-w-6xl mx-auto">
           {/* Top Pill / Badge */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-6 animate-fade-in">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-accent/10 text-accent border border-accent/30 shadow-sm shadow-accent/10">
-              <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
-              SQL Interview Syllabus — Enough for Placements
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-6 animate-fade-in">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded font-mono text-xs font-semibold uppercase tracking-wider bg-card-bg text-foreground border border-card-border">
+              SQL Interview Syllabus
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-card-bg/80 text-muted border border-card-border">
-              ⚡ 100% Clearcut Articles
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded font-mono text-xs bg-card-bg text-muted border border-card-border">
+              Article-First Curriculum
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              🎯 Self-Paced
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded font-mono text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
+              100% Free &middot; Self-Paced
             </span>
           </div>
 
           {/* Main Headline */}
           <div className="text-center max-w-4xl mx-auto mb-10">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.15] mb-6">
-              Master SQL for Placements with{' '}
-              <span className="gradient-text">Clearcut Articles</span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.12] mb-5 text-foreground">
+              Master SQL for Placements with Clearcut Articles
             </h1>
-            <p className="text-lg sm:text-xl text-muted leading-relaxed max-w-2xl mx-auto">
-              A self-paced, interview-adaptable SQL course designed to crack placement rounds and tech interviews with clearcut, step-by-step articles.
+            <p className="text-base sm:text-lg text-muted leading-relaxed max-w-2xl mx-auto">
+              A self-paced, interview-focused SQL course designed to crack placement rounds and technical screenings with concise, step-by-step articles.
             </p>
 
             {/* Quick action buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-7">
               <a
                 href="#register-section"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-accent to-accent-2 text-white font-bold text-base shadow-xl shadow-accent/25 hover:shadow-accent/40 hover:scale-[1.02] active:scale-95 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-foreground text-background font-semibold text-sm hover:opacity-90 active:scale-98 transition-all cursor-pointer shadow-xs"
               >
                 <span>Register for Course Updates</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
               </a>
 
               <a
                 href="#curriculum"
-                className="inline-flex items-center gap-2 px-6 py-4 rounded-2xl bg-card-bg/80 hover:bg-card-border/40 text-foreground font-semibold text-base border border-card-border backdrop-blur-md transition-all duration-200"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-card-bg hover:bg-card-border/30 text-foreground font-semibold text-sm border border-card-border transition-colors cursor-pointer"
               >
-                <span>Explore 9 Placement Levels</span>
-                <svg className="w-4 h-4 text-muted" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <span>Explore 9 Curriculum Levels</span>
+                <svg className="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                 </svg>
               </a>
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12 pt-10 border-t border-card-border/60 max-w-3xl mx-auto">
-              <div className="p-3 rounded-xl bg-card-bg/40 border border-card-border/40">
-                <div className="text-2xl sm:text-3xl font-black text-foreground">9 Levels</div>
-                <div className="text-xs text-muted font-medium mt-0.5">Basics to Advanced</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-10 pt-8 border-t border-card-border max-w-3xl mx-auto">
+              <div className="p-3 rounded-lg bg-card-bg border border-card-border">
+                <div className="text-xl sm:text-2xl font-black text-foreground">9 Levels</div>
+                <div className="text-[11px] text-muted font-medium mt-0.5">Foundations to Advanced</div>
               </div>
-              <div className="p-3 rounded-xl bg-card-bg/40 border border-card-border/40">
-                <div className="text-2xl sm:text-3xl font-black text-rose-500">High Yield</div>
-                <div className="text-xs text-muted font-medium mt-0.5">Joins & Window Funcs</div>
+              <div className="p-3 rounded-lg bg-card-bg border border-card-border">
+                <div className="text-xl sm:text-2xl font-black text-foreground">High Yield</div>
+                <div className="text-[11px] text-muted font-medium mt-0.5">Joins &amp; Window Funcs</div>
               </div>
-              <div className="p-3 rounded-xl bg-card-bg/40 border border-card-border/40">
-                <div className="text-2xl sm:text-3xl font-black text-emerald-500">100%</div>
-                <div className="text-xs text-muted font-medium mt-0.5">Free & Self-Paced</div>
+              <div className="p-3 rounded-lg bg-card-bg border border-card-border">
+                <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">100%</div>
+                <div className="text-[11px] text-muted font-medium mt-0.5">Free &amp; Self-Paced</div>
               </div>
-              <div className="p-3 rounded-xl bg-card-bg/40 border border-card-border/40">
-                <div className="text-2xl sm:text-3xl font-black text-accent">Clearcut</div>
-                <div className="text-xs text-muted font-medium mt-0.5">Article Walkthroughs</div>
+              <div className="p-3 rounded-lg bg-card-bg border border-card-border">
+                <div className="text-xl sm:text-2xl font-black text-accent">Clearcut</div>
+                <div className="text-[11px] text-muted font-medium mt-0.5">Article Walkthroughs</div>
               </div>
             </div>
           </div>

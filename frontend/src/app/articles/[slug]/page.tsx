@@ -224,7 +224,7 @@ export default async function ArticlePage({ params }: PageProps) {
             <>
               {/* Cover Image */}
               {article.coverImage && (
-                <div className="mb-10 rounded-2xl overflow-hidden aspect-video max-h-[440px] border border-card-border shadow-xl shadow-black/10">
+                <div className="mb-8 rounded-xl overflow-hidden aspect-video max-h-[460px] border border-card-border shadow-xs">
                   <img
                     src={article.coverImage}
                     alt={article.title}
@@ -234,22 +234,25 @@ export default async function ArticlePage({ params }: PageProps) {
               )}
 
               {/* Article Header */}
-              <header className="mb-8">
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="text-xs font-bold text-accent tracking-wider uppercase bg-accent/10 border border-accent/25 px-2.5 py-1 rounded-lg">
+              <header className="mb-8 border-b border-card-border pb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="font-mono text-xs font-semibold uppercase tracking-wider text-accent bg-accent/8 border border-accent/20 px-2 py-0.5 rounded">
                     {article.category}
                   </span>
+                  <span className="text-xs font-mono text-muted">
+                    Technical Dispatch
+                  </span>
                 </div>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-6 leading-tight text-foreground">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-5 leading-tight text-foreground">
                   {article.title}
                 </h1>
-                <div className="flex items-center gap-3 text-sm text-muted border-b border-card-border/60 pb-6">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/30 to-accent-2/30 border border-accent/25 flex items-center justify-center text-[10px] font-black text-accent flex-shrink-0">
+                <div className="flex items-center gap-3 text-xs text-muted">
+                  <div className="w-6 h-6 rounded bg-card-border flex items-center justify-center text-[10px] font-mono font-bold text-foreground flex-shrink-0">
                     {article.author.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
                     <span className="font-semibold text-foreground">{article.author}</span>
-                    <span className="mx-2 text-muted/50">·</span>
+                    <span className="mx-2 text-muted/60">·</span>
                     <time dateTime={article.createdAt}>{formattedDate}</time>
                   </div>
                 </div>
@@ -257,20 +260,20 @@ export default async function ArticlePage({ params }: PageProps) {
 
               {/* Excerpt */}
               {article.excerpt && (
-                <div className="text-lg md:text-xl text-muted font-medium mb-10 pl-6 border-l-2 border-accent italic leading-relaxed">
+                <div className="text-base sm:text-lg text-muted font-normal mb-8 pl-4 border-l-2 border-foreground/30 italic leading-relaxed">
                   {article.excerpt}
                 </div>
               )}
 
               {/* Tags */}
               {article.tags.filter((t) => t.trim()).length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-10">
+                <div className="flex flex-wrap gap-1.5 mb-8">
                   {article.tags
                     .filter((tag) => tag.trim())
                     .map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs bg-card-bg border border-card-border text-muted px-3 py-1 rounded-lg"
+                        className="text-xs font-mono bg-card-bg border border-card-border text-muted px-2 py-0.5 rounded"
                       >
                         #{tag}
                       </span>
@@ -301,20 +304,20 @@ export default async function ArticlePage({ params }: PageProps) {
           </SqlCourseArticleGate>
 
           {/* Author Card */}
-          <div className="border-t border-card-border/60 pt-8">
-            <div className="bg-card-bg border border-card-border p-6 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="border-t border-card-border pt-8 mt-12">
+            <div className="bg-card-bg border border-card-border p-5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/30 to-accent-2/30 border border-accent/25 flex items-center justify-center text-sm font-black text-accent flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-card-border flex items-center justify-center text-xs font-mono font-bold text-foreground flex-shrink-0">
                   {article.author.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-foreground">{article.author}</h4>
-                  <p className="text-xs text-muted">Author at SyntaxFlow</p>
+                  <p className="text-xs text-muted">Author &middot; SyntaxFlow Journal</p>
                 </div>
               </div>
               <time
                 dateTime={article.updatedAt || article.createdAt}
-                className="text-xs text-muted/70 bg-background border border-card-border px-3 py-1.5 rounded-lg w-fit flex-shrink-0"
+                className="text-xs font-mono text-muted bg-background border border-card-border px-2.5 py-1 rounded w-fit flex-shrink-0"
               >
                 Updated: {formattedDate}
               </time>

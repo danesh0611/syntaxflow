@@ -54,24 +54,25 @@ function SearchContent() {
   return (
     <>
       <Header />
-      <main className="max-w-6xl w-full mx-auto px-6 py-12 flex-1">
-        <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground mb-2">Search Articles</h1>
-          <p className="text-sm text-muted">Find guides, tutorials, and documentations across the site.</p>
+      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1">
+        <div className="mb-8 border-b border-card-border pb-6">
+          <div className="font-mono text-xs uppercase tracking-wider text-muted mb-2">Library Search</div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-2">Archive Search</h1>
+          <p className="text-sm text-muted">Scan through algorithms, systems architecture guides, and technical tutorials.</p>
         </div>
 
-        <form onSubmit={handleSearch} className="mb-10">
+        <form onSubmit={handleSearch} className="mb-8">
           <div className="flex gap-2">
             <input
               type="text"
               name="query"
-              placeholder="Search by title, content, or tags..."
+              placeholder="Search by title, concepts, or keywords (e.g. CTEs, Dynamic Programming)..."
               defaultValue={searchQuery}
-              className="flex-1 px-4 py-3 bg-card-bg border border-card-border rounded-xl text-foreground placeholder-muted/65 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all text-sm"
+              className="flex-1 px-3.5 py-2.5 bg-card-bg border border-card-border rounded-lg text-foreground placeholder:text-muted/50 focus:outline-none focus:border-foreground transition-colors text-sm"
             />
             <button
               type="submit"
-              className="bg-accent text-white px-6 py-3 rounded-xl hover:opacity-95 transition-all font-semibold text-sm shadow-lg shadow-accent-glow/20 cursor-pointer"
+              className="bg-foreground text-background px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity font-semibold text-xs cursor-pointer"
             >
               Search
             </button>
@@ -79,12 +80,12 @@ function SearchContent() {
         </form>
 
         {searchQuery && (
-          <div className="mb-8 border-b border-card-border/50 pb-4">
-            <p className="text-sm text-muted">
+          <div className="mb-6 border-b border-card-border/60 pb-3 flex items-center justify-between text-xs font-mono text-muted">
+            <span>
               {loading 
-                ? 'Searching...' 
-                : `Found ${articles.length} result${articles.length !== 1 ? 's' : ''} for "${searchQuery}"`}
-            </p>
+                ? 'SCANNING ARCHIVE...' 
+                : `FOUND ${articles.length} RESULT${articles.length !== 1 ? 'S' : ''} FOR "${searchQuery.toUpperCase()}"`}
+            </span>
           </div>
         )}
 

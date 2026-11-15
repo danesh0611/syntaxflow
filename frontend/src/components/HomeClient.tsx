@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Article, Category } from '@/lib/types';
 import { ArticleCard } from '@/components/ArticleCard';
 import { Header } from '@/components/Header';
@@ -14,283 +14,587 @@ interface HomeClientProps {
 
 export default function HomeClient({ initialArticles, initialCategories }: HomeClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const articlesRef = useRef<HTMLElement>(null);
+  const [activeDsaFilter, setActiveDsaFilter] = useState<string>('all');
+  const [directoryViewMode, setDirectoryViewMode] = useState<'grid' | 'compact'>('grid');
+  const [searchFilter, setSearchFilter] = useState<string>('');
+  const directoryRef = useRef<HTMLElement>(null);
+  const dsaSectionRef = useRef<HTMLElement>(null);
+  const engineeringSectionRef = useRef<HTMLElement>(null);
 
   const handleCategorySelect = (cat: string) => {
     setSelectedCategory(cat);
     setTimeout(() => {
-      articlesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      directoryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 50);
   };
 
-  const filteredArticles = selectedCategory
-    ? initialArticles.filter((a) => a.category === selectedCategory)
-    : initialArticles;
+  // 1. Coding Round & DSA Articles
+  const dsaArticles = useMemo(() => {
+    return initialArticles.filter(
+      (a) =>
+        a.category?.toLowerCase().includes('data structure') ||
+        a.category?.toLowerCase().includes('algorithm') ||
+        a.category?.toLowerCase().includes('dsa') ||
+        a.tags?.some((t) => /dsa|leetcode/i.test(t))
+    );
+  }, [initialArticles]);
 
-  const featuredArticle = filteredArticles[0] ?? null;
-  const restArticles = filteredArticles.slice(1);
+  // Filtered DSA subset for the DSA section
+  const filteredDsaArticles = useMemo(() => {
+    if (activeDsaFilter === 'all') return dsaArticles;
+    const filter = activeDsaFilter.toLowerCase();
+    return dsaArticles.filter(
+      (a) =>
+        a.title.toLowerCase().includes(filter) ||
+        a.tags?.some((t) => t.toLowerCase().includes(filter)) ||
+        (a.excerpt && a.excerpt.toLowerCase().includes(filter))
+    );
+  }, [dsaArticles, activeDsaFilter]);
+
+  // 2. Core Engineering Subjects (Wireless, SDR, Hardware)
+  const engineeringArticles = useMemo(() => {
+    return initialArticles.filter(
+      (a) =>
+        (a.category?.toLowerCase().includes('wireless') ||
+        a.category?.toLowerCase().includes('system') ||
+        /sdr|frequency|synthesizer|receiver|ash|superheterodyne/i.test(a.title)) &&
+        !(a.category?.toLowerCase().includes('data structure') ||
+        a.category?.toLowerCase().includes('algorithm') ||
+        a.tags?.some((t) => /dsa|leetcode/i.test(t)))
+    );
+  }, [initialArticles]);
+
+  // 3. Python & Machine Learning
+  const pythonMlArticles = useMemo(() => {
+    return initialArticles.filter(
+      (a) =>
+        (a.category?.toLowerCase().includes('python') ||
+        a.category?.toLowerCase().includes('machine learning') ||
+        /python|cluster|k-means/i.test(a.title)) &&
+        !(a.category?.toLowerCase().includes('data structure') ||
+        a.category?.toLowerCase().includes('algorithm') ||
+        a.tags?.some((t) => /dsa|leetcode/i.test(t)))
+    );
+  }, [initialArticles]);
+
+  // 4. Industry Realities & Resume Projects
+  const industryArticles = useMemo(() => {
+    return initialArticles.filter(
+      (a) =>
+        (a.category?.toLowerCase().includes('global') ||
+        a.category?.toLowerCase().includes('projects') ||
+        /scam|layoffs|profitable|trust platform/i.test(a.title)) &&
+        !(a.category?.toLowerCase().includes('data structure') ||
+        a.category?.toLowerCase().includes('algorithm') ||
+        a.tags?.some((t) => /dsa|leetcode/i.test(t)))
+    );
+  }, [initialArticles]);
+
+  // 5. Filtered Articles for Complete Search Directory
+  const directoryArticles = useMemo(() => {
+    let list = initialArticles;
+    if (selectedCategory) {
+      list = list.filter(
+        (a) => a.category?.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
+      );
+    }
+    if (searchFilter.trim()) {
+      const q = searchFilter.toLowerCase();
+      list = list.filter(
+        (a) =>
+          a.title.toLowerCase().includes(q) ||
+          a.excerpt?.toLowerCase().includes(q) ||
+          a.category?.toLowerCase().includes(q) ||
+          a.tags?.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [initialArticles, selectedCategory, searchFilter]);
 
   return (
     <>
       <Header />
-      <main className="max-w-6xl w-full mx-auto px-6 py-12 flex-1">
+      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1">
 
-        {/* HERO */}
-        <section className="relative mb-20 text-center py-16 md:py-24 overflow-hidden">
-          {/* Floating gradient orbs */}
-          <div
-            className="absolute rounded-full blur-[80px] opacity-30 animate-float pointer-events-none"
-            style={{
-              width: 420, height: 420,
-              background: 'radial-gradient(circle, #6366f1 0%, #4f46e5 50%, transparent 70%)',
-              top: '10%', left: '5%',
-            }}
-          />
-          <div
-            className="absolute rounded-full blur-[100px] opacity-25 animate-float-medium pointer-events-none"
-            style={{
-              width: 360, height: 360,
-              background: 'radial-gradient(circle, #8b5cf6 0%, #7c3aed 50%, transparent 70%)',
-              top: '0%', right: '8%',
-            }}
-          />
-          <div
-            className="absolute rounded-full blur-[90px] opacity-20 animate-float-slow pointer-events-none"
-            style={{
-              width: 300, height: 300,
-              background: 'radial-gradient(circle, #ec4899 0%, #db2777 50%, transparent 70%)',
-              bottom: '0%', left: '40%',
-            }}
-          />
-
-          {/* Content */}
-          <div className="relative z-10">
-            {/* Ticker badge */}
-            <div className="animate-ticker inline-flex items-center gap-2 bg-accent/10 border border-accent/25 rounded-full px-4 py-1.5 text-xs font-bold text-accent mb-8 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-              Tech insights · DSA · Tutorials
+        {/* ── 1. HERO ────────────────────────────────────────────── */}
+        <section className="mb-12 sm:mb-16 border-b border-card-border pb-10 sm:pb-12 animate-fade-in">
+          <div className="flex items-center justify-between border-b border-card-border/60 pb-3 mb-6 text-xs font-mono text-muted">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+              <span className="font-semibold text-foreground">SyntaxFlow</span>
+              <span className="text-muted/50">/</span>
+              <span>Engineering &amp; Placement Preparation</span>
             </div>
-
-            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight leading-[1.05] animate-fade-up delay-100">
-              Insights for the{' '}
-              <br className="hidden sm:block" />
-              <span className="gradient-text">Modern Developer</span>
-            </h1>
-
-            <p className="text-lg md:text-xl text-muted max-w-xl mx-auto leading-relaxed animate-fade-up delay-200 mb-10">
-              Deep-dives, systems architecture, coding tutorials, and the latest in tech.
-            </p>
-
-            <div className="animate-fade-up delay-300 flex items-center justify-center gap-4 flex-wrap">
-              <Link
-                href="/search"
-                className="inline-flex items-center gap-2 bg-accent text-white font-bold px-6 py-3 rounded-2xl hover:bg-accent/90 active:scale-95 transition-all duration-200 shadow-xl shadow-accent/30"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                Explore Articles
-              </Link>
-              <Link
-                href="/#articles"
-                className="inline-flex items-center gap-2 bg-card-bg border border-card-border text-foreground font-bold px-6 py-3 rounded-2xl hover:border-accent/40 hover:shadow-lg hover:shadow-accent/10 active:scale-95 transition-all duration-200"
-              >
-                Latest Articles
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </Link>
+            <div className="hidden sm:flex items-center gap-3 text-[11px] text-muted">
+              <span>DSA Solutions</span>
+              <span>&bull;</span>
+              <span>100 FAANG Sheet</span>
+              <span>&bull;</span>
+              <span>SQL Course</span>
+              <span>&bull;</span>
+              <span>Core Subjects</span>
             </div>
           </div>
-        </section>
 
-        {/* SQL COURSE ANNOUNCEMENT BANNER */}
-        <section className="mb-14 animate-fade-up">
-          <Link
-            href="/sql-course"
-            className="group block relative overflow-hidden rounded-3xl border border-accent/30 bg-gradient-to-r from-accent/15 via-accent-2/10 to-accent-3/15 p-6 sm:p-8 backdrop-blur-xl shadow-xl shadow-accent/5 hover:border-accent/60 hover:shadow-accent/15 transition-all duration-300"
-          >
-            <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-accent/20 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-accent text-white shadow-md shadow-accent/30">
-                    New Launch • Free
+          <div className="max-w-3xl space-y-3">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-tight">
+              Technical Placement Prep &amp; Core Engineering
+            </h1>
+            <p className="text-sm sm:text-base text-muted leading-relaxed max-w-2xl">
+              High-yield DSA editorials with dry-run tables, an interactive 100 FAANG tracker, a structured SQL interview curriculum, and semester guides for wireless and systems architecture.
+            </p>
+          </div>
+
+          {/* Quick Hub Launch Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-8">
+            {/* Tool 1: DSA Sheet */}
+            <Link
+              href="/dsa-sheet"
+              className="group p-4 sm:p-5 rounded-xl bg-card-bg border border-card-border hover:border-card-border-hover hover:-translate-y-1 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="font-mono text-[10px] font-bold text-accent bg-accent/8 border border-accent/20 px-2 py-0.5 rounded uppercase">
+                    TRACKER
                   </span>
-                  <span className="text-xs font-semibold text-accent">Self-Paced Course</span>
+                  <span className="text-muted group-hover:text-accent group-hover:translate-x-1 transition-all text-xs font-bold">&rarr;</span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-foreground group-hover:text-accent transition-colors">
-                  Master SQL for Tech Interviews with Clearcut Articles 🚀
-                </h2>
-                <p className="text-sm text-muted max-w-2xl leading-relaxed">
-                  Window functions, recursive CTEs, indexing traps, and 100+ real interview schemas without 40-hour slow videos. Register now for free updates & early access!
+                <h3 className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
+                  100 FAANG DSA Sheet
+                </h3>
+                <p className="text-xs text-muted mt-1.5 leading-relaxed">
+                  Checklist with live LeetCode stats, company tags, and editorial links.
                 </p>
               </div>
+            </Link>
 
-              <div className="flex-shrink-0">
-                <span className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent text-white font-bold text-sm shadow-lg shadow-accent/25 group-hover:bg-accent/90 group-hover:scale-105 active:scale-95 transition-all">
-                  <span>Register Free</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                </span>
+            {/* Tool 2: SQL Placement Course */}
+            <Link
+              href="/sql-course"
+              className="group p-4 sm:p-5 rounded-xl bg-card-bg border border-card-border hover:border-emerald-500/30 hover:-translate-y-1 hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded uppercase">
+                    COURSE
+                  </span>
+                  <span className="text-muted group-hover:text-emerald-500 group-hover:translate-x-1 transition-all text-xs font-bold">&rarr;</span>
+                </div>
+                <h3 className="text-sm font-semibold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  SQL for Tech Interviews
+                </h3>
+                <p className="text-xs text-muted mt-1.5 leading-relaxed">
+                  9 placement levels, window functions, CTEs, and 100+ real interview schemas.
+                </p>
               </div>
-            </div>
-          </Link>
+            </Link>
+
+            {/* Tool 3: Algorithmic Solutions */}
+            <button
+              onClick={() => {
+                dsaSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="group p-4 sm:p-5 rounded-xl bg-card-bg border border-card-border hover:border-card-border-hover hover:-translate-y-1 hover:shadow-md text-left transition-all duration-200 flex flex-col justify-between cursor-pointer"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="font-mono text-[10px] font-bold text-accent bg-accent/8 border border-accent/20 px-2 py-0.5 rounded uppercase">
+                    EDITORIALS
+                  </span>
+                  <span className="text-muted group-hover:text-accent group-hover:translate-y-1 transition-all text-xs font-bold">&darr;</span>
+                </div>
+                <h3 className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
+                  DSA Solutions ({dsaArticles.length})
+                </h3>
+                <p className="text-xs text-muted mt-1.5 leading-relaxed">
+                  Step-by-step dry runs, brute force to optimal code, and edge case trade-offs.
+                </p>
+              </div>
+            </button>
+
+            {/* Tool 4: Core Subjects & Tech */}
+            <button
+              onClick={() => {
+                engineeringSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="group p-4 sm:p-5 rounded-xl bg-card-bg border border-card-border hover:border-amber-500/30 hover:-translate-y-1 hover:shadow-md text-left transition-all duration-200 flex flex-col justify-between cursor-pointer"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="font-mono text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase">
+                    CORE
+                  </span>
+                  <span className="text-muted group-hover:text-amber-500 group-hover:translate-y-1 transition-all text-xs font-bold">&darr;</span>
+                </div>
+                <h3 className="text-sm font-semibold text-foreground group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Engineering Subjects
+                </h3>
+                <p className="text-xs text-muted mt-1.5 leading-relaxed">
+                  Wireless Communications, SDR, RF Synthesizers, Signals, and Python essentials.
+                </p>
+              </div>
+            </button>
+          </div>
         </section>
 
-        {/* CATEGORIES */}
-        {initialCategories.length > 0 && (
-          <section className="mb-14 animate-fade-up delay-400" id="categories">
-            <h2 className="text-sm font-bold mb-4 tracking-widest text-muted uppercase flex items-center gap-2">
-              <span className="w-4 h-px bg-accent/60 inline-block" />
-              Browse Categories
-              <span className="w-4 h-px bg-accent/60 inline-block" />
-            </h2>
-            <div className="flex flex-wrap gap-2.5">
-              <button
-                id="category-all"
-                onClick={() => handleCategorySelect('')}
-                className={`px-5 py-2 rounded-xl text-sm font-bold border transition-all duration-300 cursor-pointer ${
-                  selectedCategory === ''
-                    ? 'bg-accent border-accent text-white shadow-lg shadow-accent/25 scale-[1.03]'
-                    : 'bg-card-bg border-card-border text-muted hover:text-foreground hover:border-accent/40 hover:shadow-md hover:shadow-accent/10'
-                }`}
-              >
-                All Articles
-              </button>
-              {initialCategories.map((cat) => (
-                <button
-                  key={cat.id}
-                  id={`category-${cat.slug}`}
-                  onClick={() => handleCategorySelect(cat.name)}
-                  className={`px-5 py-2 rounded-xl text-sm font-bold border transition-all duration-300 cursor-pointer ${
-                    selectedCategory === cat.name
-                      ? 'bg-accent border-accent text-white shadow-lg shadow-accent/25 scale-[1.03]'
-                      : 'bg-card-bg border-card-border text-muted hover:text-foreground hover:border-accent/40 hover:shadow-md hover:shadow-accent/10'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
+        {/* ── 2. SECTION: CODING ROUNDS & DSA EDITORIALS ─────────────── */}
+        <section ref={dsaSectionRef} className="mb-12 sm:mb-16" style={{ scrollMarginTop: '80px' }}>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-card-border pb-4 mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                <span className="font-mono text-xs uppercase tracking-wider text-muted">
+                  Coding Rounds &middot; DSA
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                Algorithmic Editorials &amp; Dry Runs
+              </h2>
+              <p className="text-xs sm:text-sm text-muted mt-1 max-w-xl">
+                Brute-force to optimal C++ with step-by-step dry-run tables and complexity trade-offs.
+              </p>
             </div>
-          </section>
-        )}
 
-        {/* ARTICLES */}
-        <section id="articles" ref={articlesRef} style={{ scrollMarginTop: '80px' }}>
-          {/* Section header */}
-          <div className="flex items-center justify-between mb-8 animate-fade-up delay-500">
-            <h2 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-3">
-              <span className="w-1.5 h-7 rounded-full bg-gradient-to-b from-accent to-accent-2 flex-shrink-0" />
-              {selectedCategory ? selectedCategory : 'Latest Articles'}
-            </h2>
-            <div className="flex items-center gap-2">
-              {selectedCategory && (
-                <button
-                  onClick={() => handleCategorySelect('')}
-                  className="flex items-center gap-1.5 text-xs font-bold text-accent bg-accent/10 border border-accent/25 px-3 py-1.5 rounded-xl hover:bg-accent/15 transition-all duration-200 cursor-pointer"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Clear filter
-                </button>
-              )}
-              <span className="text-xs font-bold text-muted bg-card-bg border border-card-border px-3.5 py-1.5 rounded-xl">
-                {filteredArticles.length} article{filteredArticles.length !== 1 ? 's' : ''}
-              </span>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Link
+                href="/dsa-sheet"
+                className="px-3.5 py-1.5 rounded-md text-xs font-medium bg-foreground text-background hover:opacity-90 transition-opacity"
+              >
+                100 FAANG Tracker &rarr;
+              </Link>
             </div>
           </div>
 
-          {filteredArticles.length === 0 ? (
-            <div className="py-24 bg-card-bg/40 border border-dashed border-card-border rounded-2xl text-center">
-              <div className="max-w-sm mx-auto px-6">
-                <svg className="w-12 h-12 text-muted/40 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                </svg>
-                <h3 className="text-lg font-bold mb-1 text-foreground">No articles yet</h3>
-                <p className="text-muted text-sm">Nothing published in this category yet. Check back soon.</p>
-              </div>
+          {/* Sub-topic Filter Chips for DSA */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-6 scrollbar-none">
+            {[
+              { label: 'All', filter: 'all' },
+              { label: 'Sliding Window', filter: 'window' },
+              { label: 'Stacks & Queues', filter: 'stack' },
+              { label: 'Trees & BST', filter: 'tree' },
+              { label: 'Dynamic Programming', filter: 'dynamic' },
+              { label: 'Heaps', filter: 'heap' },
+              { label: 'Strings', filter: 'string' },
+            ].map((tab) => (
+              <button
+                key={tab.filter}
+                onClick={() => setActiveDsaFilter(tab.filter)}
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                  activeDsaFilter === tab.filter
+                    ? 'bg-foreground text-background'
+                    : 'bg-card-bg border border-card-border text-muted hover:text-foreground hover:border-card-border-hover'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Curated DSA Cards */}
+          {filteredDsaArticles.length === 0 ? (
+            <div className="py-12 bg-card-bg border border-dashed border-card-border rounded-lg text-center">
+              <p className="text-sm font-medium text-foreground">No matching DSA questions under this topic</p>
+              <button
+                onClick={() => setActiveDsaFilter('all')}
+                className="mt-2 text-xs font-medium text-accent hover:underline cursor-pointer"
+              >
+                Show all DSA questions
+              </button>
             </div>
           ) : (
-            <>
-              {/* Featured article — first article, wide horizontal card */}
-              {featuredArticle && (
-                <Link href={`/articles/${featuredArticle.slug}`} className="group block mb-8 animate-fade-up delay-500">
-                  <div className="card-glow bg-card-bg border border-card-border rounded-[1.125rem] overflow-hidden">
-                    <div className="flex flex-col md:flex-row min-h-[260px]">
-                      {/* Image */}
-                      <div className="md:w-[42%] overflow-hidden flex-shrink-0 relative">
-                        {featuredArticle.coverImage ? (
-                          <img
-                            src={featuredArticle.coverImage}
-                            alt={featuredArticle.title}
-                            className="w-full h-56 md:h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
-                          />
-                        ) : (
-                          <div className="w-full h-56 md:h-full flex items-center justify-center relative overflow-hidden"
-                            style={{ background: 'linear-gradient(135deg, #0d1035 0%, #1a0a2e 50%, #0d1035 100%)' }}>
-                            <div className="absolute w-40 h-40 rounded-full blur-3xl opacity-30"
-                              style={{ background: 'radial-gradient(circle, #6366f1, transparent)' }} />
-                            <span className="relative text-xs font-black tracking-[0.3em] uppercase text-indigo-400/50">SyntaxFlow</span>
-                          </div>
-                        )}
-                        {/* Overlay gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card-bg/20 hidden md:block pointer-events-none" />
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredDsaArticles.slice(0, 6).map((article, i) => (
+                <ArticleCard key={article.id} article={article} index={i} />
+              ))}
+            </div>
+          )}
 
-                      {/* Content */}
-                      <div className="md:w-[58%] p-7 md:p-9 flex flex-col justify-center">
-                        <div className="flex items-center gap-3 mb-4">
-                          <span className="text-[11px] font-bold text-accent tracking-wider uppercase bg-accent/10 border border-accent/20 px-2.5 py-1 rounded-lg">
-                            {featuredArticle.category}
-                          </span>
-                          <span className="text-[11px] font-bold text-muted/70 uppercase tracking-wider bg-card-border/50 border border-card-border px-2.5 py-1 rounded-lg">
-                            ✦ Featured
-                          </span>
-                        </div>
+          {/* Expand / View All DSA Footer */}
+          <div className="mt-5 pt-3 border-t border-card-border/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted">
+            <span>Showing {Math.min(6, filteredDsaArticles.length)} of {dsaArticles.length} DSA guides</span>
+            <button
+              onClick={() => handleCategorySelect('Data Structures and algorithms')}
+              className="font-medium text-accent hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto"
+            >
+              <span>View all {dsaArticles.length} DSA solutions in Directory &rarr;</span>
+            </button>
+          </div>
+        </section>
 
-                        <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-tight text-foreground mb-4 group-hover:text-accent transition-colors duration-300">
-                          {featuredArticle.title}
-                        </h2>
+        {/* ── 3. SECTION: CORE ENGINEERING SEMESTER SUBJECTS ──────────── */}
+        <section ref={engineeringSectionRef} className="mb-12 sm:mb-16" style={{ scrollMarginTop: '80px' }}>
+          <div className="border-b border-card-border pb-4 mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              <span className="font-mono text-xs uppercase tracking-wider text-muted">
+                Semester Subjects &middot; Core Hardware
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+              Wireless Communications &amp; Systems Architecture
+            </h2>
+            <p className="text-xs sm:text-sm text-muted mt-1 max-w-xl">
+              Visual study guides and technical breakdowns for semester exams and electronics/embedded interviews.
+            </p>
+          </div>
 
-                        <p className="text-muted leading-relaxed mb-6 line-clamp-3 text-sm md:text-base">
-                          {featuredArticle.excerpt}
-                        </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {engineeringArticles.slice(0, 4).map((article, i) => (
+              <ArticleCard key={article.id} article={article} index={i} />
+            ))}
+          </div>
+        </section>
 
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/30 to-accent-2/30 border border-accent/25 flex items-center justify-center text-[10px] font-black text-accent flex-shrink-0">
-                              {featuredArticle.author.slice(0, 2).toUpperCase()}
-                            </div>
-                            <div>
-                              <p className="text-sm font-bold text-foreground">{featuredArticle.author}</p>
-                              <p className="text-xs text-muted">{new Date(featuredArticle.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                            </div>
-                          </div>
-                          <span className="text-xs font-bold text-accent flex items-center gap-1 group-hover:gap-2 transition-all duration-300">
-                            Read article
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              )}
-
-              {/* Rest of articles — 3-col grid */}
-              {restArticles.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {restArticles.map((article, i) => (
-                    <ArticleCard key={article.id} article={article} index={i} />
-                  ))}
+        {/* ── 4. SECTION: PYTHON, ML & RESUME PROJECTS ───────────────── */}
+        <section className="mb-12 sm:mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left: Python & Machine Learning */}
+            <div className="lg:col-span-6 space-y-4">
+              <div className="border-b border-card-border pb-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted">
+                    Software &middot; Machine Learning
+                  </span>
                 </div>
+                <h3 className="text-lg font-bold tracking-tight text-foreground">
+                  Python Fundamentals &amp; Machine Learning
+                </h3>
+              </div>
+
+              <div className="space-y-2.5">
+                {pythonMlArticles.slice(0, 3).map((article, i) => (
+                  <ArticleCard key={article.id} article={article} index={i} variant="row" />
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Industry Happenings & Resume Projects */}
+            <div className="lg:col-span-6 space-y-4">
+              <div className="border-b border-card-border pb-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted">
+                    Industry &middot; Projects
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold tracking-tight text-foreground">
+                  Tech Market &amp; Portfolio Projects
+                </h3>
+              </div>
+
+              <div className="space-y-2.5">
+                {industryArticles.slice(0, 3).map((article, i) => (
+                  <ArticleCard key={article.id} article={article} index={i} variant="row" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. SPOTLIGHT: SQL PLACEMENT BLUEPRINT ──────────────────── */}
+        <section className="mb-12 sm:mb-16">
+          <div className="group rounded-xl border border-card-border bg-card-bg hover:border-emerald-500/40 p-6 sm:p-7 flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all duration-200 hover:shadow-xs">
+            <div className="max-w-2xl space-y-2">
+              <div className="flex items-center gap-2 text-xs font-mono text-muted">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-medium">Self-Paced Course &middot; Free</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                SQL for Technical Interviews
+              </h3>
+              <p className="text-xs sm:text-sm text-muted leading-relaxed">
+                9 structured levels covering Window Functions (<code className="text-foreground">ROW_NUMBER</code>, <code className="text-foreground">DENSE_RANK</code>), Multi-Table Joins, Recursive CTEs, Index Traps, and 100+ real interview schemas.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <Link
+                href="/sql-course"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-foreground text-background font-medium text-xs hover:opacity-90 hover:-translate-y-0.5 active:scale-98 transition-all shadow-xs"
+              >
+                <span>View SQL Course</span>
+                <span aria-hidden="true" className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 6. COMPLETE SEARCHABLE DIRECTORY ───────────────────────── */}
+        <section
+          id="directory"
+          ref={directoryRef}
+          className="border-t border-card-border pt-10 sm:pt-12 pb-8"
+          style={{ scrollMarginTop: '80px' }}
+        >
+          {/* Header & Search */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                <span>{selectedCategory ? `${selectedCategory}` : 'Complete Subject Directory'}</span>
+                <span className="font-mono text-xs text-muted">
+                  ({directoryArticles.length})
+                </span>
+              </h2>
+              <p className="text-xs text-muted mt-0.5">
+                Instant search across all interview solutions, semester subjects, and technical tutorials.
+              </p>
+            </div>
+
+            {/* Search Input & View Switcher */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  placeholder="Filter articles..."
+                  className="w-48 sm:w-60 px-3 py-1.5 pl-8 rounded-md bg-card-bg border border-card-border text-xs text-foreground placeholder:text-muted/50 focus:outline-none focus:border-foreground transition-colors"
+                />
+                <svg
+                  className="w-3.5 h-3.5 text-muted absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                {searchFilter && (
+                  <button
+                    onClick={() => setSearchFilter('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-foreground cursor-pointer px-1"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center bg-card-bg border border-card-border rounded-md p-0.5">
+                <button
+                  onClick={() => setDirectoryViewMode('grid')}
+                  title="Grid view"
+                  className={`p-1.5 rounded text-xs transition-colors cursor-pointer ${
+                    directoryViewMode === 'grid'
+                      ? 'bg-foreground text-background'
+                      : 'text-muted hover:text-foreground'
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setDirectoryViewMode('compact')}
+                  title="List view"
+                  className={`p-1.5 rounded text-xs transition-colors cursor-pointer ${
+                    directoryViewMode === 'compact'
+                      ? 'bg-foreground text-background'
+                      : 'text-muted hover:text-foreground'
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Active Filter Indicator */}
+          {(selectedCategory || searchFilter) && (
+            <div className="flex items-center gap-2 mb-4 text-xs font-mono">
+              <span className="text-muted">Filtering:</span>
+              {selectedCategory && (
+                <span className="px-2 py-0.5 rounded bg-accent/10 border border-accent/25 text-accent flex items-center gap-1">
+                  Topic: {selectedCategory}
+                  <button onClick={() => setSelectedCategory('')} className="hover:text-foreground cursor-pointer">×</button>
+                </span>
               )}
-            </>
+              {searchFilter && (
+                <span className="px-2 py-0.5 rounded bg-card-bg border border-card-border text-foreground flex items-center gap-1">
+                  &ldquo;{searchFilter}&rdquo;
+                  <button onClick={() => setSearchFilter('')} className="hover:text-foreground cursor-pointer">×</button>
+                </span>
+              )}
+              <button
+                onClick={() => {
+                  setSelectedCategory('');
+                  setSearchFilter('');
+                }}
+                className="text-xs text-muted hover:text-foreground underline cursor-pointer ml-1"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+
+          {/* Topic Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-6 scrollbar-none">
+            <button
+              onClick={() => setSelectedCategory('')}
+              className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                selectedCategory === ''
+                  ? 'bg-foreground text-background'
+                  : 'bg-card-bg border border-card-border text-muted hover:text-foreground hover:border-card-border-hover'
+              }`}
+            >
+              All Content ({initialArticles.length})
+            </button>
+            {initialCategories.map((cat) => {
+              const count = initialArticles.filter(
+                (a) => a.category?.trim().toLowerCase() === cat.name?.trim().toLowerCase()
+              ).length;
+              if (count === 0) return null;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.name)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                    selectedCategory.trim().toLowerCase() === cat.name.trim().toLowerCase()
+                      ? 'bg-foreground text-background'
+                      : 'bg-card-bg border border-card-border text-muted hover:text-foreground hover:border-card-border-hover'
+                  }`}
+                >
+                  {cat.name} ({count})
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Directory Listings */}
+          {directoryArticles.length === 0 ? (
+            <div className="py-16 bg-card-bg border border-dashed border-card-border rounded-xl text-center">
+              <p className="text-sm font-semibold text-foreground">No matching content found</p>
+              <p className="text-xs text-muted mt-1">Try another search keyword or pick a topic pill above.</p>
+              {(selectedCategory || searchFilter) && (
+                <button
+                  onClick={() => {
+                    setSelectedCategory('');
+                    setSearchFilter('');
+                  }}
+                  className="mt-3 text-xs font-semibold text-accent hover:underline cursor-pointer"
+                >
+                  Reset filters
+                </button>
+              )}
+            </div>
+          ) : directoryViewMode === 'compact' ? (
+            <div className="space-y-2">
+              {directoryArticles.map((article, i) => (
+                <ArticleCard key={article.id} article={article} index={i} variant="row" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {directoryArticles.map((article, i) => (
+                <ArticleCard key={article.id} article={article} index={i} variant="card" />
+              ))}
+            </div>
           )}
         </section>
       </main>
