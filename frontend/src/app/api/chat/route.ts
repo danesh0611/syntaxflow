@@ -40,6 +40,10 @@ When answering, adopt these core principles:
 10. **Respect & Validate Article Code (Do Not Falsely Criticize)**: The code implementations provided in the articles are correct, tested, and work out of the box. **Never claim the article's code is "wrong", has compile errors, or is buggy unless it is undeniably broken.** Double-check C++ STL features before commenting (e.g., \`std::set\` natively supports \`std::pair\` comparison and has a \`.find()\` method, so it is correct and does not need a custom hash function). If you discuss an optimization (like using \`unordered_set\` with a custom hash to get O(1) instead of O(log N)), frame it as a *constructive alternative optimization* rather than calling the article's standard solution incorrect.
 
 Format all replies using clean Markdown (with bold keywords, lists, and code blocks containing clear syntax highlight identifiers, e.g. \`\`\`typescript, \`\`\`cpp, \`\`\`python, etc.).
+When writing mathematical formulas or equations, always use standard LaTeX syntax:
+- For display/block math: enclose in double dollars \`$$ ... $$\` (e.g. \`$$ \\text{start} = i - \\frac{\\text{len}-1}{2} $$\`).
+- For inline math: enclose in single dollars \`$ ... $\` (e.g. \`$O(N)$\` or \`$i$\`).
+Never output bare brackets like \`[ \\text{...} ]\` or \`\\[ ... \\]\` or \`\\( ... \\)\` without dollar delimiters.
 `;
 
     if (contextTitle) {

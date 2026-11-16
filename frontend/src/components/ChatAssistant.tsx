@@ -4,11 +4,86 @@ import React, { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import katex from 'katex';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+}
+
+// Format LaTeX math safely into KaTeX HTML or styled math elements
+function renderLatexInText(text: string): React.ReactNode {
+  if (!text) return '';
+
+  // Match:
+  // 1. $$ ... $$ (display math)
+  // 2. \[ ... \] or [ \text... ] (display math with brackets)
+  // 3. $ ... $ (inline math)
+  // 4. \( ... \) (inline math)
+  const regex = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\[\s*(?:\\[a-zA-Z]+[\s\S]*?)\]|\$[^\$\n]+?\$|\\\([\s\S]*?\\\))/g;
+
+  const parts = text.split(regex);
+
+  return parts.map((part, i) => {
+    if (!part) return null;
+
+    let formula = '';
+    let isDisplay = false;
+
+    if (part.startsWith('$$') && part.endsWith('$$')) {
+      formula = part.slice(2, -2).trim();
+      isDisplay = true;
+    } else if (part.startsWith('\\[') && part.endsWith('\\]')) {
+      formula = part.slice(2, -2).trim();
+      isDisplay = true;
+    } else if (part.startsWith('[') && part.endsWith(']') && part.includes('\\')) {
+      formula = part.slice(1, -1).trim();
+      isDisplay = true;
+    } else if (part.startsWith('\\(') && part.endsWith('\\)')) {
+      formula = part.slice(2, -2).trim();
+      isDisplay = false;
+    } else if (part.startsWith('$') && part.endsWith('$')) {
+      formula = part.slice(1, -1).trim();
+      isDisplay = false;
+    } else {
+      return part;
+    }
+
+    try {
+      const html = katex.renderToString(formula, {
+        displayMode: isDisplay,
+        throwOnError: false,
+      });
+      return (
+        <span
+          key={i}
+          className={isDisplay ? 'block my-2 text-center overflow-x-auto' : 'inline-block mx-0.5'}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      );
+    } catch {
+      return <code key={i} className="font-mono text-xs">{formula}</code>;
+    }
+  });
+}
+
+function processChildren(children: React.ReactNode): React.ReactNode {
+  if (typeof children === 'string') {
+    return renderLatexInText(children);
+  }
+  if (Array.isArray(children)) {
+    return children.map((c, idx) => <React.Fragment key={idx}>{processChildren(c)}</React.Fragment>);
+  }
+  if (React.isValidElement(children)) {
+    const el = children as React.ReactElement<any>;
+    if (el.props && el.props.children) {
+      return React.cloneElement(el, {
+        children: processChildren(el.props.children),
+      });
+    }
+  }
+  return children;
 }
 
 export default function ChatAssistant() {
@@ -308,7 +383,27 @@ export default function ChatAssistant() {
                   >
                     {msg.role === 'assistant' ? (
                       <div className="prose dark:prose-invert max-w-none text-xs sm:text-sm space-y-2">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ children }) => <p className="mb-2 last:mb-0">{processChildren(children)}</p>,
+                            li: ({ children }) => <li>{processChildren(children)}</li>,
+                            strong: ({ children }) => <strong className="font-semibold">{processChildren(children)}</strong>,
+                            em: ({ children }) => <em>{processChildren(children)}</em>,
+                            blockquote: ({ children }) => <blockquote>{processChildren(children)}</blockquote>,
+                            code: ({ className, children, ...props }) => {
+                              const str = String(children || '');
+                              if (str.startsWith('\\') && (str.includes('{') || str.includes('^') || str.includes('_'))) {
+                                return <>{renderLatexInText(`$${str}$`)}</>;
+                              }
+                              return (
+                                <code className={className} {...props}>
+                                  {children}
+                                </code>
+                              );
+                            },
+                          }}
+                        >
                           {msg.content}
                         </ReactMarkdown>
                       </div>
