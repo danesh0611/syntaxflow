@@ -52,18 +52,15 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
 
   // 2. Core Engineering Subjects Highlight (Only 2 articles shown on homepage)
   const coreEngineeringSpotlight = useMemo(() => {
-    return initialArticles.filter(
-      (a) =>
-        (a.category?.toLowerCase().includes('wireless') ||
-        a.category?.toLowerCase().includes('automata') ||
-        a.category?.toLowerCase().includes('formal language') ||
-        a.category?.toLowerCase().includes('system') ||
-        /sdr|frequency|synthesizer|receiver|ash|superheterodyne|automata/i.test(a.title)) &&
-        !(a.category?.toLowerCase().includes('data structure') ||
-        a.category?.toLowerCase().includes('algorithm') ||
-        a.category?.toLowerCase().includes('dsa') ||
-        a.tags?.some((t) => /dsa|leetcode/i.test(t)))
-    ).slice(0, 2);
+    return initialArticles.filter((a) => {
+      const cat = a.category?.trim().toLowerCase() || '';
+      return (
+        cat === 'short range wireless communication' ||
+        cat === 'formal language automata' ||
+        cat.includes('wireless') ||
+        cat.includes('automata')
+      );
+    }).slice(0, 2);
   }, [initialArticles]);
 
   // 3. Python & Machine Learning

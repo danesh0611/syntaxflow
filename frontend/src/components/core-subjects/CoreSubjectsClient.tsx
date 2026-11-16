@@ -40,10 +40,10 @@ export const CORE_SUBJECTS: SubjectConfig[] = [
       'Transmitter Power & Modulation Schemes',
       'Semester Exam Solved Breakdowns',
     ],
-    match: (a: Article) =>
-      a.category?.toLowerCase().includes('wireless') ||
-      /sdr|frequency|synthesizer|receiver|ash|superheterodyne|rf\b|wireless/i.test(a.title) ||
-      a.tags?.some((t) => /wireless|rf|sdr|antenna|srwc/i.test(t)),
+    match: (a: Article) => {
+      const cat = a.category?.trim().toLowerCase() || '';
+      return cat === 'short range wireless communication' || cat.includes('wireless');
+    },
   },
   {
     id: 'fla',
@@ -61,11 +61,10 @@ export const CORE_SUBJECTS: SubjectConfig[] = [
       'Context-Free Grammars & Pushdown Automata',
       'Turing Machines & Decidability',
     ],
-    match: (a: Article) =>
-      a.category?.toLowerCase().includes('automata') ||
-      a.category?.toLowerCase().includes('formal language') ||
-      /automata|dfa|nfa|cfg|turing|grammar|language theory/i.test(a.title) ||
-      a.tags?.some((t) => /automata|fla|toc|dfa|nfa/i.test(t)),
+    match: (a: Article) => {
+      const cat = a.category?.trim().toLowerCase() || '';
+      return cat === 'formal language automata' || cat.includes('automata');
+    },
   },
 ];
 
