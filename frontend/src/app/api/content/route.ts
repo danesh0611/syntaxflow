@@ -47,7 +47,23 @@ const sanityClient =
       })
     : null;
 
-const articleProjection = `
+const articleListProjection = `
+  _id,
+  title,
+  slug,
+  excerpt,
+  contentType,
+  author,
+  tags,
+  keywords,
+  mainImage{asset->{url}, alt},
+  category->{title, slug},
+  publishedAt,
+  _createdAt,
+  _updatedAt
+`;
+
+const articleDetailProjection = `
   _id,
   title,
   slug,
@@ -152,7 +168,7 @@ export async function GET(request: Request) {
       }
 
       const doc = await sanityClient.fetch<SanityArticleDoc | null>(
-        `*[_type == "post" && slug.current == $slug][0] {${articleProjection}}`,
+        `*[_type == "post" && slug.current == $slug][0] {${articleDetailProjection}}`,
         { slug }
       );
       return NextResponse.json(doc ? mapArticle(doc) : null);
@@ -168,14 +184,27 @@ export async function GET(request: Request) {
           htmlContent match $searchTerm ||
           category->title match $searchTerm ||
           tags[] match $searchTerm
-        )] | order(publishedAt desc) {${articleProjection}}`,
+        )] | order(publishedAt desc) {${articleListProjection}}`,
         { searchTerm: `*${q}*` }
       );
       return NextResponse.json(docs.map(mapArticle));
     }
 
+    const category = url.searchParams.get('category');
+    if (category) {
+      const docs = await sanityClient.fetch<SanityArticleDoc[]>(
+        `*[_type == "post" && (
+          category->slug.current == $category ||
+          lower(category->title) match lower($category) ||
+          $category in tags
+        )] | order(publishedAt desc) {${articleListProjection}}`,
+        { category }
+      );
+      return NextResponse.json(docs.map(mapArticle));
+    }
+
     const docs = await sanityClient.fetch<SanityArticleDoc[]>(
-      `*[_type == "post"] | order(publishedAt desc) {${articleProjection}}`
+      `*[_type == "post"] | order(publishedAt desc) {${articleListProjection}}`
     );
     return NextResponse.json(docs.map(mapArticle));
   } catch (error) {

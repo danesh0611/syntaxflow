@@ -79,17 +79,11 @@ export const SqlCourseDashboardClient: React.FC<SqlCourseDashboardClientProps> =
   const fetchSqlArticles = async () => {
     setIsRefreshing(true);
     try {
-      const res = await fetch('/api/content?resource=articles');
+      const res = await fetch('/api/content?resource=articles&category=sql');
       if (res.ok) {
-        const allArticles = (await res.json()) as Article[];
-        if (Array.isArray(allArticles)) {
-          const sqlOnly = allArticles.filter(
-            (a) =>
-              a.category?.toLowerCase() === 'sql' ||
-              a.category?.toLowerCase().includes('sql') ||
-              a.tags?.some((t) => t.toLowerCase() === 'sql')
-          );
-          setArticles(sqlOnly);
+        const sqlArticles = (await res.json()) as Article[];
+        if (Array.isArray(sqlArticles)) {
+          setArticles(sqlArticles);
         }
       }
     } catch (err) {
@@ -100,7 +94,10 @@ export const SqlCourseDashboardClient: React.FC<SqlCourseDashboardClientProps> =
   };
 
   useEffect(() => {
-    fetchSqlArticles();
+    // Only re-fetch on mount if server didn't pre-seed initial articles
+    if (!initialArticles || initialArticles.length === 0) {
+      fetchSqlArticles();
+    }
   }, []);
 
   const handleToggleRead = (slug: string, e: React.MouseEvent) => {
