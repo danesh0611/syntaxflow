@@ -271,14 +271,22 @@ const portableTextComponents: PortableTextComponents = {
   types: {
     image: ({ value }: { value: { alt?: string; asset?: { _ref?: string } } }) => {
       const image = urlForImage(value);
-      const src = image?.width(1200).url() || '';
+      const src = image?.width(1200).auto('format').quality(75).url() || '';
       const alt = value?.alt || '';
 
       if (!src) {
         return null;
       }
 
-      return <img src={src} alt={alt} className="w-full rounded-xl my-6" />;
+      return (
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          className="w-full rounded-xl my-6"
+        />
+      );
     },
     video: ({ value }: { value: { url?: string; caption?: string } }) => {
       const url = value?.url || '';

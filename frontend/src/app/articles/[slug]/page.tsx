@@ -8,6 +8,7 @@ import { getBaseUrl } from '@/lib/utils';
 import { SqlCourseArticleGate } from '@/components/sql-course/SqlCourseArticleGate';
 import { MarkAsReadButton } from '@/components/MarkAsReadButton';
 import { HtmlArticleRenderer } from '@/components/HtmlArticleRenderer';
+import { getOptimizedImageUrl, getSanitySrcSet } from '@/lib/image';
 
 const RichContent = dynamicImport(
   () => import('@/components/RichContent').then((mod) => mod.RichContent),
@@ -226,8 +227,15 @@ export default async function ArticlePage({ params }: PageProps) {
               {article.coverImage && (
                 <div className="mb-8 rounded-xl overflow-hidden aspect-video max-h-[460px] border border-card-border shadow-xs">
                   <img
-                    src={article.coverImage}
+                    src={getOptimizedImageUrl(article.coverImage, 1200)}
+                    srcSet={getSanitySrcSet(article.coverImage)}
+                    sizes="(max-width: 896px) 100vw, 896px"
                     alt={article.title}
+                    width={896}
+                    height={504}
+                    fetchPriority="high"
+                    loading="eager"
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                 </div>

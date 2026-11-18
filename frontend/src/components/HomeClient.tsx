@@ -145,6 +145,7 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
           </div>
 
           {/* Quick Hub Launch Cards */}
+          <h2 className="sr-only">Placement Preparation Hubs</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-8">
             {/* Tool 1: DSA Sheet */}
             <Link
@@ -153,7 +154,7 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
             >
               <div>
                 <div className="flex items-center justify-between mb-2.5">
-                  <span className="font-mono text-[10px] font-bold text-accent bg-accent/8 border border-accent/20 px-2 py-0.5 rounded uppercase">
+                  <span className="font-mono text-[10px] font-bold text-blue-700 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded uppercase">
                     TRACKER
                   </span>
                   <span className="text-muted group-hover:text-accent group-hover:translate-x-1 transition-all text-xs font-bold">&rarr;</span>
@@ -174,12 +175,12 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
             >
               <div>
                 <div className="flex items-center justify-between mb-2.5">
-                  <span className="font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded uppercase">
+                  <span className="font-mono text-[10px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded uppercase">
                     COURSE
                   </span>
                   <span className="text-muted group-hover:text-emerald-500 group-hover:translate-x-1 transition-all text-xs font-bold">&rarr;</span>
                 </div>
-                <h3 className="text-sm font-semibold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <h3 className="text-sm font-semibold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
                   SQL for Tech Interviews
                 </h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
@@ -197,7 +198,7 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
             >
               <div>
                 <div className="flex items-center justify-between mb-2.5">
-                  <span className="font-mono text-[10px] font-bold text-accent bg-accent/8 border border-accent/20 px-2 py-0.5 rounded uppercase">
+                  <span className="font-mono text-[10px] font-bold text-blue-700 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded uppercase">
                     EDITORIALS
                   </span>
                   <span className="text-muted group-hover:text-accent group-hover:translate-y-1 transition-all text-xs font-bold">&darr;</span>
@@ -218,12 +219,12 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
             >
               <div>
                 <div className="flex items-center justify-between mb-2.5">
-                  <span className="font-mono text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase">
+                  <span className="font-mono text-[10px] font-bold text-amber-900 dark:text-amber-300 bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 rounded uppercase">
                     SUBJECTS
                   </span>
                   <span className="text-muted group-hover:text-amber-500 group-hover:translate-x-1 transition-all text-xs font-bold">&rarr;</span>
                 </div>
-                <h3 className="text-sm font-semibold text-foreground group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                <h3 className="text-sm font-semibold text-foreground group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
                   Core Subjects
                 </h3>
                 <p className="text-xs text-muted mt-1.5 leading-relaxed">
@@ -408,7 +409,7 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
             <div className="max-w-2xl space-y-2">
               <div className="flex items-center gap-2 text-xs font-mono text-muted">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-emerald-600 dark:text-emerald-400 font-medium">Self-Paced Course &middot; Free</span>
+                <span className="text-emerald-800 dark:text-emerald-300 font-semibold">Self-Paced Course &middot; Free</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                 SQL for Technical Interviews

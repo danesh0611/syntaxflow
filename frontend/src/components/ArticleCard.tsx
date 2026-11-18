@@ -1,6 +1,7 @@
 import React from 'react';
 import { Article } from '@/lib/types';
 import Link from 'next/link';
+import { getOptimizedImageUrl, getSanitySrcSet } from '@/lib/image';
 
 interface ArticleCardProps {
   article: Article;
@@ -14,21 +15,30 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   index = 0,
   variant = 'card',
 }) => {
-  const formattedDate = new Date(article.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  // Use UTC to ensure identical output on SSR and browser hydration (fixes React #418)
+  const formattedDate = React.useMemo(() => {
+    if (!article.createdAt) return '';
+    const date = new Date(article.createdAt);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-US', {
+      timeZone: 'UTC',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }, [article.createdAt]);
 
   if (variant === 'row') {
     return (
       <article className="group py-3.5 px-4 rounded-xl border border-card-border/60 hover:border-card-border hover:bg-card-bg/80 transition-all duration-150 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card-bg/40">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-accent bg-accent/8 border border-accent/20 px-1.5 py-0.2 rounded">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded">
               {article.category}
             </span>
-            <span className="text-[11px] font-mono text-muted">{formattedDate}</span>
+            <span className="text-[11px] font-mono text-muted" suppressHydrationWarning>
+              {formattedDate}
+            </span>
           </div>
           <h3 className="text-sm font-bold text-foreground group-hover:text-accent transition-colors truncate">
             <Link href={`/articles/${article.slug}`}>{article.title}</Link>
@@ -42,10 +52,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           <span className="text-xs text-muted hidden md:inline-block">{article.author}</span>
           <Link
             href={`/articles/${article.slug}`}
+            aria-label={`Read ${article.title}`}
             className="text-xs font-semibold text-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1"
           >
             <span>Read</span>
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg aria-hidden="true" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
           </Link>
@@ -63,8 +74,15 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
       {article.coverImage ? (
         <div className="relative aspect-video w-full overflow-hidden bg-neutral-900 border-b border-card-border">
           <img
-            src={article.coverImage}
+            src={getOptimizedImageUrl(article.coverImage, 720)}
+            srcSet={getSanitySrcSet(article.coverImage)}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
             alt={article.title}
+            width={360}
+            height={202}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'auto'}
+            decoding="async"
             className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500 ease-out"
           />
         </div>
@@ -86,21 +104,23 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
       <div className="flex flex-col flex-1 p-5">
         {/* Category & Date */}
         <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-accent bg-accent/8 border border-accent/20 px-2 py-0.5 rounded">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded">
             {article.category}
           </span>
-          <span className="text-[11px] font-mono text-muted">{formattedDate}</span>
+          <span className="text-[11px] font-mono text-muted" suppressHydrationWarning>
+            {formattedDate}
+          </span>
         </div>
 
         {/* Title */}
-        <h2 className="text-base font-bold mb-2.5 line-clamp-2 leading-snug tracking-tight">
+        <h3 className="text-base font-bold mb-2.5 line-clamp-2 leading-snug tracking-tight">
           <Link
             href={`/articles/${article.slug}`}
             className="text-foreground hover:text-accent transition-colors duration-150"
           >
             {article.title}
           </Link>
-        </h2>
+        </h3>
 
         {/* Excerpt */}
         <p className="text-muted text-sm mb-4 line-clamp-2 leading-relaxed flex-1">
@@ -116,7 +136,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               .map((tag) => (
                 <span
                   key={tag}
-                  className="text-[10px] font-mono text-muted bg-card-border/30 border border-card-border/60 px-1.5 py-0.5 rounded"
+                  className="text-[10px] font-mono font-medium text-slate-700 dark:text-slate-300 bg-card-border/40 dark:bg-card-border/60 border border-card-border/80 px-1.5 py-0.5 rounded"
                 >
                   #{tag}
                 </span>
@@ -137,10 +157,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
           <Link
             href={`/articles/${article.slug}`}
+            aria-label={`Read ${article.title}`}
             className="text-xs font-semibold text-accent group-hover:translate-x-0.5 transition-transform flex items-center gap-1"
           >
             <span>Read</span>
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg aria-hidden="true" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
           </Link>
