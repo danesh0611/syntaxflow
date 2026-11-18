@@ -66,6 +66,31 @@ export const CORE_SUBJECTS: SubjectConfig[] = [
       return cat === 'formal language automata' || cat.includes('automata');
     },
   },
+  {
+    id: 'cn',
+    code: 'CN',
+    title: 'Computer Networks',
+    tagline: 'Network Architecture, Topologies, Switching & Protocols',
+    badge: 'Networking & Systems',
+    badgeColor: 'text-indigo-600 dark:text-indigo-400 border-indigo-500/20 bg-indigo-500/10',
+    description:
+      'In-depth study guides covering physical topologies (Bus, Ring, Star, Mesh, Tree, Hybrid), circuit switching, multiplexing (FDM/TDM), geographic scopes (PAN, LAN, MAN, WAN), and performance delay analysis.',
+    topics: [
+      'Physical Topologies: Bus, Ring, Star, Mesh & Tree',
+      'Circuit Switching & Dedicated Channel Handshakes',
+      'FDM vs TDM Multiplexing Schemes',
+      'Geographic Scopes: PAN, LAN, MAN & WAN',
+      'Network Fault Tolerance & Cable Delay Formulas',
+    ],
+    match: (a: Article) => {
+      const cat = a.category?.trim().toLowerCase() || '';
+      return (
+        cat === 'computer networks' ||
+        cat.includes('network') ||
+        a.tags?.some((t) => t.toLowerCase().includes('network'))
+      );
+    },
+  },
 ];
 
 export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClientProps) {
@@ -119,7 +144,7 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
           </p>
 
           {/* ── SUBJECT SELECTOR CARDS ─────────────────────────────────── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             {CORE_SUBJECTS.map((sub) => {
               const isSelected = selectedSubjectId === sub.id;
               const count = initialArticles.filter(sub.match).length;

@@ -8,9 +8,12 @@ export const runtime = 'edge';
 export const metadata: Metadata = {
   title: 'Core Engineering Subjects & Semester Guides | SyntaxFlow',
   description:
-    'Comprehensive semester and interview study guides for Core Engineering subjects including Short Range Wireless (SRW) and Formal Languages & Automata Theory (FLA).',
+    'Comprehensive semester and interview study guides for Core Engineering subjects including Computer Networks (CN), Short Range Wireless (SRW), and Formal Languages & Automata Theory (FLA).',
   keywords: [
     'core engineering subjects',
+    'computer networks',
+    'network topologies',
+    'circuit switching',
     'short range wireless communication',
     'srw lecture notes',
     'formal language and automata theory',
@@ -23,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Core Engineering Subjects | SyntaxFlow',
     description:
-      'Master core engineering subjects like Short Range Wireless (SRW) and Formal Languages & Automata (FLA) with visual architecture breakdowns, state machines, and solved practice problems.',
+      'Master core engineering subjects like Computer Networks (CN), Short Range Wireless (SRW), and Formal Languages & Automata (FLA) with visual architecture breakdowns, state machines, and solved practice problems.',
     url: 'https://syntaxflowarticles.pages.dev/core-subjects',
     siteName: 'SyntaxFlow',
     type: 'website',
@@ -32,7 +35,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Core Engineering Subjects | SyntaxFlow',
     description:
-      'Master core engineering subjects like Short Range Wireless (SRW) and Formal Languages & Automata (FLA) with visual architecture breakdowns and state machines.',
+      'Master core engineering subjects like Computer Networks (CN), Short Range Wireless (SRW), and Formal Languages & Automata (FLA) with visual architecture breakdowns and state machines.',
   },
 };
 
