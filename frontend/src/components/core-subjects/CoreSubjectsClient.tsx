@@ -13,16 +13,13 @@ interface CoreSubjectsClientProps {
 }
 
 export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClientProps) {
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('cn');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const selectedSubject = useMemo(() => {
-    return CORE_SUBJECTS.find((s) => s.id === selectedSubjectId) || CORE_SUBJECTS[0];
-  }, [selectedSubjectId]);
-
-  // Subject-specific articles
-  const subjectArticles = useMemo(() => {
-    const list = initialArticles.filter(selectedSubject.match);
+  // Articles across all core subjects
+  const allCoreArticles = useMemo(() => {
+    const list = initialArticles.filter((a) =>
+      CORE_SUBJECTS.some((sub) => sub.match(a))
+    );
     if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
     return list.filter(
@@ -31,14 +28,14 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
         a.excerpt?.toLowerCase().includes(q) ||
         a.tags?.some((t) => t.toLowerCase().includes(q))
     );
-  }, [initialArticles, selectedSubject, searchQuery]);
+  }, [initialArticles, searchQuery]);
 
   return (
     <>
       <Header />
       <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-1">
         
-        {/* Breadcrumb / Top Bar */}
+        {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 mb-6 text-xs font-mono text-muted">
           <Link href="/" className="hover:text-foreground transition-colors">
             Home
@@ -47,7 +44,7 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
           <span className="text-foreground font-semibold">Core Subjects</span>
         </div>
 
-        {/* Hero Banner */}
+        {/* Hero Section */}
         <section className="mb-10 sm:mb-12 border-b border-card-border pb-8 sm:pb-10">
           <div className="flex items-center gap-2 mb-2">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
@@ -55,117 +52,103 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
               Curriculum &amp; Technical Interviews
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
             Core Engineering Subjects
           </h1>
           <p className="text-sm sm:text-base text-muted mt-2 max-w-2xl leading-relaxed">
-            Choose a subject below to explore dedicated chapter-wise guides, visual architecture breakdowns, state machines, and university-standard exam questions.
+            Select any subject below to open its dedicated notes, visual architecture breakdowns, state machines, and university exam guides.
           </p>
 
-          {/* ── SUBJECT CARDS WITH DEDICATED ROUTES ──────────────────────── */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8">
+          {/* ── THE 3 CORE SUBJECT CARDS (Direct Links) ──────────────────────── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
             {CORE_SUBJECTS.map((sub) => {
-              const isSelected = selectedSubjectId === sub.id;
               const count = initialArticles.filter(sub.match).length;
 
               return (
-                <div
+                <Link
                   key={sub.id}
-                  onClick={() => {
-                    setSelectedSubjectId(sub.id);
-                    setSearchQuery('');
-                  }}
-                  className={`group p-5 sm:p-6 rounded-2xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
-                    isSelected
-                      ? 'bg-card-bg border-foreground shadow-sm ring-1 ring-foreground/10'
-                      : 'bg-card-bg/60 border-card-border hover:border-card-border-hover hover:-translate-y-0.5 hover:shadow-xs'
-                  }`}
+                  href={`/core-subjects/${sub.slug}`}
+                  className="group p-6 rounded-2xl border border-card-border bg-card-bg/70 hover:bg-card-bg hover:border-foreground/40 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded border ${sub.badgeColor}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className={`font-mono text-[11px] font-bold px-2.5 py-0.5 rounded border ${sub.badgeColor}`}>
                         {sub.code} &middot; {sub.badge}
                       </span>
-                      <span
-                        className={`text-xs font-mono font-medium px-2 py-0.5 rounded ${
-                          isSelected
-                            ? 'bg-foreground text-background font-semibold'
-                            : 'bg-card-border/40 text-muted group-hover:text-foreground'
-                        }`}
-                      >
+                      <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-card-border/50 text-foreground/80 group-hover:bg-foreground group-hover:text-background transition-colors">
                         {count} {count === 1 ? 'Article' : 'Articles'}
                       </span>
                     </div>
 
-                    <h2
-                      className={`text-lg sm:text-xl font-bold tracking-tight transition-colors ${
-                        isSelected ? 'text-foreground' : 'text-foreground/90 group-hover:text-foreground'
-                      }`}
-                    >
+                    <h2 className="text-xl font-bold tracking-tight text-foreground group-hover:text-foreground transition-colors">
                       {sub.title}
                     </h2>
-                    <p className="text-xs sm:text-sm text-muted mt-1.5 leading-relaxed">
+                    
+                    <p className="text-xs sm:text-sm font-medium text-foreground/70 mt-1">
                       {sub.tagline}
                     </p>
+
+                    <p className="text-xs text-muted mt-2.5 leading-relaxed line-clamp-3">
+                      {sub.description}
+                    </p>
+
+                    {/* Topics preview */}
+                    <div className="mt-4 pt-4 border-t border-card-border/60">
+                      <div className="flex flex-wrap gap-1.5">
+                        {sub.topics.slice(0, 3).map((topic, idx) => (
+                          <span
+                            key={idx}
+                            className="text-[10px] px-2 py-0.5 rounded bg-background border border-card-border text-muted font-medium"
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                        {sub.topics.length > 3 && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded text-muted">
+                            +{sub.topics.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-card-border/60 flex items-center justify-between text-xs font-medium">
-                    <Link
-                      href={`/core-subjects/${sub.slug}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-1 font-semibold text-accent hover:underline"
-                    >
-                      <span>Open {sub.code} Route &rarr;</span>
-                    </Link>
-                    <span className="font-mono text-[11px] text-muted">
-                      {sub.topics.length} key modules
-                    </span>
+                  <div className="pt-4 mt-6 border-t border-card-border/60 flex items-center justify-between text-xs font-semibold text-accent group-hover:underline">
+                    <span>Open {sub.code} Guides</span>
+                    <span className="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
         </section>
 
-        {/* ── ACTIVE SUBJECT DETAIL & ARTICLES PREVIEW ──────────────────────── */}
-        <section className="space-y-6 animate-fade-in" key={selectedSubject.id}>
-          
-          {/* Header Bar for Active Subject */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-card-bg border border-card-border flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="space-y-1.5 max-w-2xl">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-mono text-xs uppercase tracking-wider text-muted font-bold">
-                  Active Subject: {selectedSubject.code}
+        {/* ── ALL CORE SUBJECT ARTICLES DIRECTORY ────────────────────────── */}
+        <section className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                <span>All Core Subject Guides</span>
+                <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-card-border/40 text-muted">
+                  {allCoreArticles.length} Total
                 </span>
-                <Link
-                  href={`/core-subjects/${selectedSubject.slug}`}
-                  className="ml-2 text-xs font-mono font-bold text-accent hover:underline flex items-center gap-1"
-                >
-                  <span>Go to dedicated URL</span>
-                  <span>&rarr;</span>
-                </Link>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-foreground">
-                {selectedSubject.title}
-              </h3>
-              <p className="text-xs sm:text-sm text-muted leading-relaxed">
-                {selectedSubject.description}
+              </h2>
+              <p className="text-xs text-muted mt-0.5">
+                Browse all lecture notes across Computer Networks, Short Range Wireless, and Automata Theory
               </p>
             </div>
 
-            {/* Quick search inside this subject */}
-            <div className="w-full lg:w-72">
+            {/* Search Filter */}
+            <div className="w-full sm:w-72">
               <div className="relative">
                 <input
                   type="text"
-                  placeholder={`Search ${selectedSubject.code} topics...`}
+                  placeholder="Filter all core subjects..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full text-xs bg-background border border-card-border rounded-lg pl-8 pr-3 py-2 text-foreground placeholder:text-muted focus:outline-none focus:border-foreground transition-colors"
+                  className="w-full text-xs bg-background border border-card-border rounded-xl pl-9 pr-3 py-2 text-foreground placeholder:text-muted focus:outline-none focus:border-foreground transition-colors shadow-xs"
                 />
                 <svg
-                  className="w-3.5 h-3.5 text-muted absolute left-2.5 top-1/2 -translate-y-1/2"
+                  className="w-3.5 h-3.5 text-muted absolute left-3 top-1/2 -translate-y-1/2"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -177,74 +160,26 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
             </div>
           </div>
 
-          {/* Key Topics / Syllabus Pill Bar */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-            <span className="font-mono text-[11px] text-muted flex-shrink-0 font-bold uppercase tracking-wider">
-              Syllabus Coverage:
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {selectedSubject.topics.map((topic, idx) => (
-                <span
-                  key={idx}
-                  className="px-2.5 py-1 rounded-md text-[11px] bg-card-bg border border-card-border text-foreground/80 font-medium whitespace-nowrap"
-                >
-                  {topic}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Article Grid for Current Subject */}
-          {subjectArticles.length === 0 ? (
-            <div className="py-16 bg-card-bg border border-dashed border-card-border rounded-xl text-center">
-              <p className="text-base font-semibold text-foreground">No articles match your search in {selectedSubject.code}</p>
-              <p className="text-xs text-muted mt-1">Try clearing your search query or check back soon for upcoming lectures.</p>
+          {allCoreArticles.length === 0 ? (
+            <div className="py-16 bg-card-bg border border-dashed border-card-border rounded-2xl text-center px-4">
+              <p className="text-base font-semibold text-foreground">No core subject guides match your search</p>
+              <p className="text-xs text-muted mt-1">Try clearing your search query to see all guides.</p>
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="mt-3 px-3 py-1.5 rounded-lg text-xs font-medium bg-foreground text-background hover:opacity-90 transition-opacity cursor-pointer"
+                  className="mt-3 px-3 py-1.5 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 transition-opacity cursor-pointer"
                 >
                   Clear search
                 </button>
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {subjectArticles.map((article, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {allCoreArticles.map((article, i) => (
                 <ArticleCard key={article.id} article={article} index={i} />
               ))}
             </div>
           )}
-
-          {/* Dedicated Route Callout */}
-          <div className="mt-12 p-6 rounded-2xl border border-card-border bg-card-bg/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-muted">
-                Direct Subject Routes
-              </h4>
-              <p className="text-xs text-muted mt-0.5">
-                Bookmark or share direct routes for each core subject:
-              </p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {CORE_SUBJECTS.map((s) => (
-                  <Link
-                    key={s.id}
-                    href={`/core-subjects/${s.slug}`}
-                    className="font-mono text-[11px] px-2.5 py-1 rounded-md bg-card-bg border border-card-border hover:border-foreground transition-colors text-foreground"
-                  >
-                    /core-subjects/{s.slug}
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <Link
-              href="/#directory"
-              className="text-xs font-semibold text-foreground hover:underline flex items-center gap-1 flex-shrink-0"
-            >
-              <span>Explore all {initialArticles.length} general articles</span>
-              <span>&rarr;</span>
-            </Link>
-          </div>
         </section>
 
       </main>

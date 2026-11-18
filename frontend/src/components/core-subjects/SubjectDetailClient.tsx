@@ -6,15 +6,19 @@ import { Article } from '@/lib/types';
 import { ArticleCard } from '@/components/ArticleCard';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { CORE_SUBJECTS, SubjectConfig } from '@/lib/coreSubjectsData';
+import { CORE_SUBJECTS, getSubjectBySlug } from '@/lib/coreSubjectsData';
 
 interface SubjectDetailClientProps {
-  subject: SubjectConfig;
+  subjectSlug: string;
   allArticles: Article[];
 }
 
-export default function SubjectDetailClient({ subject, allArticles }: SubjectDetailClientProps) {
+export default function SubjectDetailClient({ subjectSlug, allArticles }: SubjectDetailClientProps) {
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const subject = useMemo(() => {
+    return getSubjectBySlug(subjectSlug) || CORE_SUBJECTS[0];
+  }, [subjectSlug]);
 
   // Articles filtered for this subject
   const subjectArticles = useMemo(() => {
@@ -158,11 +162,11 @@ export default function SubjectDetailClient({ subject, allArticles }: SubjectDet
           </div>
         </section>
 
-        {/* Articles List */}
+        {/* Articles List for this Subject */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg sm:text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-              <span>{subject.title} Lecture &amp; Exam Guides</span>
+              <span>{subject.title} Study Guides &amp; Notes</span>
               <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-card-border/40 text-muted">
                 {subjectArticles.length}
               </span>
@@ -226,7 +230,7 @@ export default function SubjectDetailClient({ subject, allArticles }: SubjectDet
                 <Link
                   key={sub.id}
                   href={`/core-subjects/${sub.slug}`}
-                  className="group p-5 rounded-xl border border-card-border bg-card-bg/60 hover:bg-card-bg hover:border-card-border-hover hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between"
+                  className="group p-5 rounded-2xl border border-card-border bg-card-bg/60 hover:bg-card-bg hover:border-card-border-hover hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { contentSource } from '@/lib/cms';
-import { getSubjectBySlug, CORE_SUBJECTS } from '@/lib/coreSubjectsData';
+import { getSubjectBySlug } from '@/lib/coreSubjectsData';
 import SubjectDetailClient from '@/components/core-subjects/SubjectDetailClient';
 
 export const dynamic = 'force-dynamic';
@@ -62,7 +62,7 @@ export default async function SubjectPage({ params }: PageProps) {
     notFound();
   }
 
-  // If accessed via short alias (e.g. /core-subjects/cn or /core-subjects/srw), redirect to canonical slug
+  // Canonical redirect if accessed via short code (e.g. /core-subjects/cn -> /core-subjects/computer-networks)
   if (subjectParam.toLowerCase() !== subject.slug.toLowerCase()) {
     redirect(`/core-subjects/${subject.slug}`);
   }
@@ -72,5 +72,6 @@ export default async function SubjectPage({ params }: PageProps) {
     ? articles.filter((a) => a && a.category?.trim().toLowerCase() !== 'sql')
     : [];
 
-  return <SubjectDetailClient subject={subject} allArticles={publicArticles} />;
+  // Pass subjectSlug (string) instead of subject object so no function (match) crosses the RSC boundary
+  return <SubjectDetailClient subjectSlug={subject.slug} allArticles={publicArticles} />;
 }
