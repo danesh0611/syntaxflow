@@ -88,28 +88,9 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
                       {sub.tagline}
                     </p>
 
-                    <p className="text-xs text-muted mt-2.5 leading-relaxed line-clamp-3">
+                    <p className="text-xs text-muted mt-3 leading-relaxed">
                       {sub.description}
                     </p>
-
-                    {/* Topics preview */}
-                    <div className="mt-4 pt-4 border-t border-card-border/60">
-                      <div className="flex flex-wrap gap-1.5">
-                        {sub.topics.slice(0, 3).map((topic, idx) => (
-                          <span
-                            key={idx}
-                            className="text-[10px] px-2 py-0.5 rounded bg-background border border-card-border text-muted font-medium"
-                          >
-                            {topic}
-                          </span>
-                        ))}
-                        {sub.topics.length > 3 && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded text-muted">
-                            +{sub.topics.length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    </div>
                   </div>
 
                   <div className="pt-4 mt-6 border-t border-card-border/60 flex items-center justify-between text-xs font-semibold text-accent group-hover:underline">

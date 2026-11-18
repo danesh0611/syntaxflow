@@ -119,7 +119,7 @@ export default function SubjectDetailClient({ subjectSlug, allArticles }: Subjec
               {/* In-subject Search */}
               <div className="w-full lg:w-72 flex-shrink-0">
                 <label htmlFor="subject-search" className="block text-xs font-mono font-medium text-muted uppercase tracking-wider mb-2">
-                  Search {subject.code} Topics
+                  Search {subject.code} Guides
                 </label>
                 <div className="relative">
                   <input
@@ -140,23 +140,6 @@ export default function SubjectDetailClient({ subjectSlug, allArticles }: Subjec
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-              </div>
-            </div>
-
-            {/* Syllabus Coverage Tags */}
-            <div className="mt-6 pt-6 border-t border-card-border/60">
-              <span className="font-mono text-[11px] text-muted font-bold uppercase tracking-wider block mb-2.5">
-                Curriculum Syllabus Coverage:
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {subject.topics.map((topic, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 rounded-lg text-xs bg-background border border-card-border text-foreground/80 font-medium"
-                  >
-                    {topic}
-                  </span>
-                ))}
               </div>
             </div>
           </div>
@@ -250,7 +233,7 @@ export default function SubjectDetailClient({ subjectSlug, allArticles }: Subjec
                   </div>
                   <div className="pt-3 mt-3 border-t border-card-border/60 flex items-center justify-between text-xs font-medium text-foreground/80 group-hover:text-foreground">
                     <span>Open {sub.code} Guides &rarr;</span>
-                    <span className="font-mono text-[11px] text-muted">{sub.topics.length} topics</span>
+                    <span className="font-mono text-[11px] text-muted">{count} guides</span>
                   </div>
                 </Link>
               );
