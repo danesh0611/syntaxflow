@@ -6,95 +6,14 @@ import { Article } from '@/lib/types';
 import { ArticleCard } from '@/components/ArticleCard';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { CORE_SUBJECTS } from '@/lib/coreSubjectsData';
 
 interface CoreSubjectsClientProps {
   initialArticles: Article[];
 }
 
-export interface SubjectConfig {
-  id: string;
-  code: string;
-  title: string;
-  tagline: string;
-  badge: string;
-  badgeColor: string;
-  description: string;
-  topics: string[];
-  match: (a: Article) => boolean;
-}
-
-export const CORE_SUBJECTS: SubjectConfig[] = [
-  {
-    id: 'srw',
-    code: 'SRW',
-    title: 'Short Range Wireless Communication',
-    tagline: 'RF Transmitters, Receivers & Modern Wireless Systems',
-    badge: 'Hardware & RF',
-    badgeColor: 'text-amber-600 dark:text-amber-400 border-amber-500/20 bg-amber-500/10',
-    description:
-      'In-depth study guides covering Amplitude Shift Keying (ASK), Frequency Synthesizers, Direct Conversion, Superheterodyne, and Amplifier-Sequenced Hybrid (ASH) receiver architectures.',
-    topics: [
-      'ASH Receiver Architecture',
-      'Superheterodyne vs Direct Conversion',
-      'RF Frequency Synthesizers & PLL',
-      'Transmitter Power & Modulation Schemes',
-      'Semester Exam Solved Breakdowns',
-    ],
-    match: (a: Article) => {
-      const cat = a.category?.trim().toLowerCase() || '';
-      return cat === 'short range wireless communication' || cat.includes('wireless');
-    },
-  },
-  {
-    id: 'fla',
-    code: 'FLA',
-    title: 'Formal Languages & Automata Theory',
-    tagline: 'Computation Theory, Finite Automata, Grammars & Turing Machines',
-    badge: 'Theory & Systems',
-    badgeColor: 'text-teal-600 dark:text-teal-400 border-teal-500/20 bg-teal-500/10',
-    description:
-      'Interactive and diagram-driven breakdowns of Deterministic Finite Automata (DFA), NFA to DFA conversions, Regular Expressions, Context-Free Grammars (CFG), and Chomsky Hierarchy.',
-    topics: [
-      'Deterministic Finite Automata (DFA)',
-      'NFA with Epsilon Transitions',
-      'Regular Expressions & Pumping Lemma',
-      'Context-Free Grammars & Pushdown Automata',
-      'Turing Machines & Decidability',
-    ],
-    match: (a: Article) => {
-      const cat = a.category?.trim().toLowerCase() || '';
-      return cat === 'formal language automata' || cat.includes('automata');
-    },
-  },
-  {
-    id: 'cn',
-    code: 'CN',
-    title: 'Computer Networks',
-    tagline: 'Network Architecture, Topologies, Switching & Protocols',
-    badge: 'Networking & Systems',
-    badgeColor: 'text-indigo-600 dark:text-indigo-400 border-indigo-500/20 bg-indigo-500/10',
-    description:
-      'In-depth study guides covering physical topologies (Bus, Ring, Star, Mesh, Tree, Hybrid), circuit switching, multiplexing (FDM/TDM), geographic scopes (PAN, LAN, MAN, WAN), and performance delay analysis.',
-    topics: [
-      'Physical Topologies: Bus, Ring, Star, Mesh & Tree',
-      'Circuit Switching & Dedicated Channel Handshakes',
-      'FDM vs TDM Multiplexing Schemes',
-      'Geographic Scopes: PAN, LAN, MAN & WAN',
-      'Network Fault Tolerance & Cable Delay Formulas',
-    ],
-    match: (a: Article) => {
-      const cat = a.category?.trim().toLowerCase() || '';
-      return (
-        cat === 'computer networks' ||
-        cat.includes('network') ||
-        a.tags?.some((t) => t.toLowerCase().includes('network'))
-      );
-    },
-  },
-];
-
 export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClientProps) {
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('srw');
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('cn');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const selectedSubject = useMemo(() => {
@@ -140,23 +59,23 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
             Core Engineering Subjects
           </h1>
           <p className="text-sm sm:text-base text-muted mt-2 max-w-2xl leading-relaxed">
-            Choose a subject below to explore structured chapter-wise technical breakdowns, state machine visualizations, and university-standard exam questions.
+            Choose a subject below to explore dedicated chapter-wise guides, visual architecture breakdowns, state machines, and university-standard exam questions.
           </p>
 
-          {/* ── SUBJECT SELECTOR CARDS ─────────────────────────────────── */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+          {/* ── SUBJECT CARDS WITH DEDICATED ROUTES ──────────────────────── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8">
             {CORE_SUBJECTS.map((sub) => {
               const isSelected = selectedSubjectId === sub.id;
               const count = initialArticles.filter(sub.match).length;
 
               return (
-                <button
+                <div
                   key={sub.id}
                   onClick={() => {
                     setSelectedSubjectId(sub.id);
                     setSearchQuery('');
                   }}
-                  className={`group p-5 sm:p-6 rounded-xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
+                  className={`group p-5 sm:p-6 rounded-2xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
                     isSelected
                       ? 'bg-card-bg border-foreground shadow-sm ring-1 ring-foreground/10'
                       : 'bg-card-bg/60 border-card-border hover:border-card-border-hover hover:-translate-y-0.5 hover:shadow-xs'
@@ -191,30 +110,41 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
                   </div>
 
                   <div className="pt-4 mt-4 border-t border-card-border/60 flex items-center justify-between text-xs font-medium">
-                    <span className={isSelected ? 'text-accent font-semibold' : 'text-muted group-hover:text-foreground'}>
-                      {isSelected ? '✓ Selected Subject' : 'Click to Load Guides &rarr;'}
-                    </span>
+                    <Link
+                      href={`/core-subjects/${sub.slug}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 font-semibold text-accent hover:underline"
+                    >
+                      <span>Open {sub.code} Route &rarr;</span>
+                    </Link>
                     <span className="font-mono text-[11px] text-muted">
                       {sub.topics.length} key modules
                     </span>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
         </section>
 
-        {/* ── ACTIVE SUBJECT DETAIL & ARTICLES ──────────────────────── */}
+        {/* ── ACTIVE SUBJECT DETAIL & ARTICLES PREVIEW ──────────────────────── */}
         <section className="space-y-6 animate-fade-in" key={selectedSubject.id}>
           
           {/* Header Bar for Active Subject */}
-          <div className="p-5 sm:p-6 rounded-xl bg-card-bg border border-card-border flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="p-5 sm:p-6 rounded-2xl bg-card-bg border border-card-border flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="space-y-1.5 max-w-2xl">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="font-mono text-xs uppercase tracking-wider text-muted font-bold">
-                  Active Subject Guide: {selectedSubject.code}
+                  Active Subject: {selectedSubject.code}
                 </span>
+                <Link
+                  href={`/core-subjects/${selectedSubject.slug}`}
+                  className="ml-2 text-xs font-mono font-bold text-accent hover:underline flex items-center gap-1"
+                >
+                  <span>Go to dedicated URL</span>
+                  <span>&rarr;</span>
+                </Link>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                 {selectedSubject.title}
@@ -286,15 +216,26 @@ export default function CoreSubjectsClient({ initialArticles }: CoreSubjectsClie
             </div>
           )}
 
-          {/* Extensible Future Subjects Notice */}
-          <div className="mt-12 p-5 rounded-xl border border-dashed border-card-border/80 bg-card-bg/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Dedicated Route Callout */}
+          <div className="mt-12 p-6 rounded-2xl border border-card-border bg-card-bg/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-muted">
-                Upcoming Curriculum Subjects
+                Direct Subject Routes
               </h4>
               <p className="text-xs text-muted mt-0.5">
-                Operating Systems (OS), Computer Networks (CN), and Database Management (DBMS) guides are in preparation.
+                Bookmark or share direct routes for each core subject:
               </p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {CORE_SUBJECTS.map((s) => (
+                  <Link
+                    key={s.id}
+                    href={`/core-subjects/${s.slug}`}
+                    className="font-mono text-[11px] px-2.5 py-1 rounded-md bg-card-bg border border-card-border hover:border-foreground transition-colors text-foreground"
+                  >
+                    /core-subjects/{s.slug}
+                  </Link>
+                ))}
+              </div>
             </div>
             <Link
               href="/#directory"

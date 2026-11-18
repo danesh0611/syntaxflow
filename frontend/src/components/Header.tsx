@@ -111,7 +111,7 @@ export const Header: React.FC = () => {
             <Link
               href="/core-subjects"
               className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
-                pathname === '/core-subjects'
+                pathname === '/core-subjects' || pathname.startsWith('/core-subjects/')
                   ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
                   : 'hover:text-foreground hover:bg-card-border/30'
               }`}
@@ -267,7 +267,7 @@ export const Header: React.FC = () => {
               className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-card-border/30 transition-colors"
             >
               <span>Core Subjects</span>
-              <span className="text-xs text-muted">SRW &amp; FLA &rarr;</span>
+              <span className="text-xs text-muted">CN, SRW, FLA &rarr;</span>
             </Link>
 
             <Link
