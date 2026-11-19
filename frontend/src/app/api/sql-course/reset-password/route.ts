@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { hashPassword } from '@/lib/auth-crypto';
+import { hashPassword, generateAuthToken } from '@/lib/auth-crypto';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
@@ -44,7 +44,33 @@ export async function POST(request: Request) {
     const name = contact.attributes?.FIRSTNAME || email.split('@')[0];
     const regId = contact.attributes?.EXT_ID || 'SF-SQL-0428';
 
-    // 2. Hash the new password
+    // 2. Verify the OTP against the stored reset payload
+    const storedResetPayload: string = contact.attributes?.DOUBLE_OPT_IN || '';
+    if (!storedResetPayload || !storedResetPayload.includes('_')) {
+      return NextResponse.json(
+        { error: 'No password reset was requested. Please request a reset code first.' },
+        { status: 400 },
+      );
+    }
+
+    const [storedOtp, expiresAtStr] = storedResetPayload.split('_');
+    const expiresAt = parseInt(expiresAtStr, 10);
+
+    if (isNaN(expiresAt) || Date.now() > expiresAt) {
+      return NextResponse.json(
+        { error: 'Your reset code has expired. Please request a new one.' },
+        { status: 400 },
+      );
+    }
+
+    if (otp !== storedOtp) {
+      return NextResponse.json(
+        { error: 'Invalid reset code. Please check the 6-digit code from your email.' },
+        { status: 401 },
+      );
+    }
+
+    // 3. Hash the new password
     const newPasswordHash = await hashPassword(newPassword);
 
     // 3. Update the contact in Brevo with the new password hash
@@ -58,6 +84,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         attributes: {
           LASTNAME: newPasswordHash,
+          DOUBLE_OPT_IN: '',
         },
       }),
     });
@@ -76,9 +103,12 @@ export async function POST(request: Request) {
       status: 'confirmed',
     };
 
+    const authToken = await generateAuthToken(email);
+
     return NextResponse.json({
       success: true,
       user: userDoc,
+      authToken,
       message: 'Password reset successfully! You are now logged in.',
     });
   } catch (err: any) {

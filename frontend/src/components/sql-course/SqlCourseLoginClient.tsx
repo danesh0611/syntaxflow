@@ -62,6 +62,9 @@ export const SqlCourseLoginClient: React.FC = () => {
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('sql_course_user', JSON.stringify(data.user));
+        if (data.authToken) {
+          localStorage.setItem('sf_auth_token', data.authToken);
+        }
       }
 
       router.push('/sql-course/dashboard');
@@ -144,6 +147,9 @@ export const SqlCourseLoginClient: React.FC = () => {
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('sql_course_user', JSON.stringify(data.user));
+        if (data.authToken) {
+          localStorage.setItem('sf_auth_token', data.authToken);
+        }
       }
 
       setSuccessMessage('Password reset successfully! Redirecting to dashboard...');

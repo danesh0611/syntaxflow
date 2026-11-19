@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyPassword } from '@/lib/auth-crypto';
+import { verifyPassword, isLegacyHash, hashPassword, generateAuthToken } from '@/lib/auth-crypto';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
@@ -43,6 +43,24 @@ export async function POST(request: Request) {
                 { status: 401 }
               );
             }
+
+            // Migrate legacy SHA-256 hash to PBKDF2 on successful login
+            if (isLegacyHash(storedHash)) {
+              try {
+                const upgradedHash = await hashPassword(password);
+                await fetch(`https://api.brevo.com/v3/contacts/${encodeURIComponent(email)}`, {
+                  method: 'PUT',
+                  headers: {
+                    'api-key': brevoApiKey!,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                  },
+                  body: JSON.stringify({ attributes: { LASTNAME: upgradedHash } }),
+                });
+              } catch {
+                // Migration is best-effort; login still succeeds
+              }
+            }
           }
 
           const name = contact.attributes?.FIRSTNAME || email.split('@')[0];
@@ -71,9 +89,12 @@ export async function POST(request: Request) {
       );
     }
 
+    const authToken = await generateAuthToken(email);
+
     return NextResponse.json({
       success: true,
       user: userDoc,
+      authToken,
       message: 'Login successful! Welcome to your personalized dashboard.',
     });
   } catch (err: any) {

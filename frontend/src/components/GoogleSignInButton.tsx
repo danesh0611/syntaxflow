@@ -54,6 +54,11 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         throw new Error(data.error || 'Google authentication failed.');
       }
 
+      // Store auth token for authenticated API requests
+      if (typeof window !== 'undefined' && data.authToken) {
+        localStorage.setItem('sf_auth_token', data.authToken);
+      }
+
       onSuccess(data.user);
     } catch (err: any) {
       console.error('Google auth error:', err);

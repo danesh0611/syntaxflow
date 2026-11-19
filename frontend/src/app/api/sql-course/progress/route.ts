@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { verifyAuthToken } from '@/lib/auth-crypto';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
@@ -15,6 +16,14 @@ export async function GET(request: Request) {
 
     if (!email) {
       return NextResponse.json({ error: 'Email parameter required' }, { status: 400 });
+    }
+
+    // Auth: verify the token and ensure it matches the requested email
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    const tokenEmail = token ? await verifyAuthToken(token) : null;
+    if (!tokenEmail || tokenEmail.toLowerCase() !== email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -52,6 +61,14 @@ export async function POST(request: Request) {
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    // Auth: verify the token and ensure it matches the requested email
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    const tokenEmail = token ? await verifyAuthToken(token) : null;
+    if (!tokenEmail || tokenEmail.toLowerCase() !== email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const projectId = process.env.FIREBASE_PROJECT_ID;

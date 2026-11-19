@@ -63,9 +63,13 @@ export const MarkAsReadButton: React.FC<MarkAsReadButtonProps> = ({
 
       // Sync with Firestore if user is authenticated
       if (userEmail) {
+        const authToken = localStorage.getItem('sf_auth_token') || '';
         fetch('/api/sql-course/progress', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+          },
           body: JSON.stringify({ email: userEmail, readArticles: updated }),
         }).catch((err) => console.error('Failed to sync progress:', err));
       }

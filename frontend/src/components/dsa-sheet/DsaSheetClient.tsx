@@ -102,7 +102,10 @@ export default function DsaSheetClient() {
 
     // 2. Fetch fresh from backend cloud
     try {
-      const res = await fetch(`/api/dsa/progress?email=${encodeURIComponent(emailKey)}`);
+      const authToken = localStorage.getItem('sf_auth_token') || '';
+      const res = await fetch(`/api/dsa/progress?email=${encodeURIComponent(emailKey)}`, {
+        headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
+      });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.solvedIds) && data.solvedIds.length > 0) {
@@ -135,9 +138,13 @@ export default function DsaSheetClient() {
       localStorage.setItem(`dsa_lc_${emailKey}`, lcHandle);
     }
 
+    const authToken = localStorage.getItem('sf_auth_token') || '';
     fetch('/api/dsa/progress', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+      },
       body: JSON.stringify({
         email: user.email,
         solvedIds: updatedSolved,
@@ -337,6 +344,7 @@ export default function DsaSheetClient() {
     setLeetCodeInput('');
     setLeetCodeProfile(null);
     localStorage.removeItem('sql_course_user');
+    localStorage.removeItem('sf_auth_token');
     showToast('Logged out. Tracking is locked until you sign in.');
   };
 

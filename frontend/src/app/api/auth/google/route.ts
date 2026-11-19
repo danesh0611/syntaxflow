@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { generateAuthToken } from '@/lib/auth-crypto';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -65,9 +66,12 @@ export async function POST(request: Request) {
       }
     }
 
+    const authToken = await generateAuthToken(email);
+
     return NextResponse.json({
       success: true,
       user: userDoc,
+      authToken,
       message: `Welcome, ${name}! Signed in with Google successfully.`,
     });
   } catch (err: any) {

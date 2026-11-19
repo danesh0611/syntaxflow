@@ -1,5 +1,13 @@
 import { Article } from '@/lib/types';
 
+export interface SubjectUnit {
+  id: string;
+  number: number;
+  name: string;
+  title: string;
+  description: string;
+}
+
 export interface SubjectConfig {
   id: string;
   slug: string;
@@ -11,6 +19,7 @@ export interface SubjectConfig {
   badgeColor: string;
   description: string;
   match: (a: Article) => boolean;
+  units?: SubjectUnit[];
 }
 
 export const CORE_SUBJECTS: SubjectConfig[] = [
@@ -35,6 +44,48 @@ export const CORE_SUBJECTS: SubjectConfig[] = [
         })
       );
     },
+    units: [
+      {
+        id: 'unit-1',
+        number: 1,
+        name: 'Unit 1',
+        title: 'Network Overview, Topologies, Switching & Physical Layer',
+        description:
+          'Network architecture, OSI & TCP/IP reference models, physical topology types, circuit & packet switching, transmission media, bandwidth and latency delay analysis.',
+      },
+      {
+        id: 'unit-2',
+        number: 2,
+        name: 'Unit 2',
+        title: 'Data Link Layer & Medium Access Control (MAC)',
+        description:
+          'Framing, error detection & correction (CRC, Hamming codes), flow control protocols, sliding window, HDLC, Ethernet standards & CSMA/CD.',
+      },
+      {
+        id: 'unit-3',
+        number: 3,
+        name: 'Unit 3',
+        title: 'Network Layer, IP Addressing & Routing Protocols',
+        description:
+          'IPv4 & IPv6 addressing, CIDR, subnetting, ARP, DHCP, distance vector & link-state routing algorithms (RIP, OSPF, BGP).',
+      },
+      {
+        id: 'unit-4',
+        number: 4,
+        name: 'Unit 4',
+        title: 'Transport Layer, TCP/UDP & Congestion Control',
+        description:
+          'Process-to-process delivery, socket programming, UDP, TCP 3-way handshake, reliable data transfer, flow control & AIMD congestion avoidance.',
+      },
+      {
+        id: 'unit-5',
+        number: 5,
+        name: 'Unit 5',
+        title: 'Application Layer Protocols & Network Security',
+        description:
+          'DNS, HTTP/HTTPS, FTP, SMTP, email architecture, cryptography fundamentals, symmetric/asymmetric encryption, firewalls & TLS/SSL.',
+      },
+    ],
   },
   {
     id: 'srw',
@@ -93,4 +144,21 @@ export function getSubjectBySlug(rawSlug: string): SubjectConfig | undefined {
 
 export function getAllSubjectSlugs(): string[] {
   return CORE_SUBJECTS.map((s) => s.slug);
+}
+
+export function getArticleUnitNumber(article: Article, subjectId: string): number {
+  if (subjectId === 'cn') {
+    const tags = article.tags || [];
+    // Check tags for explicit unit e.g. "Unit 1", "Unit 2", "unit-1"
+    for (const t of tags) {
+      const match = t.match(/unit\s*([1-5])/i);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num >= 1 && num <= 5) return num;
+      }
+    }
+    // Default all current Computer Networks articles to Unit 1
+    return 1;
+  }
+  return 1;
 }

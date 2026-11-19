@@ -55,7 +55,10 @@ export const SqlCourseDashboardClient: React.FC<SqlCourseDashboardClientProps> =
           setReadSlugs(initialRead);
 
           // 2. Fetch fresh personalized progress from Firestore in the background
-          fetch(`/api/sql-course/progress?email=${encodeURIComponent(parsedUser.email)}`)
+          const authToken = localStorage.getItem('sf_auth_token') || '';
+          fetch(`/api/sql-course/progress?email=${encodeURIComponent(parsedUser.email)}`, {
+            headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
+          })
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
               if (data && Array.isArray(data.readArticles)) {
@@ -120,9 +123,13 @@ export const SqlCourseDashboardClient: React.FC<SqlCourseDashboardClientProps> =
       localStorage.setItem('sql_read_articles', JSON.stringify(updated));
 
       // Sync with Firestore
+      const authToken = localStorage.getItem('sf_auth_token') || '';
       fetch('/api/sql-course/progress', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+        },
         body: JSON.stringify({ email: user.email, readArticles: updated }),
       }).catch((err) => console.error('Failed to sync progress:', err));
     } catch (err) {
@@ -133,6 +140,7 @@ export const SqlCourseDashboardClient: React.FC<SqlCourseDashboardClientProps> =
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('sql_course_user');
+      localStorage.removeItem('sf_auth_token');
     }
     router.push('/sql-course/login');
   };
