@@ -94,14 +94,14 @@ export default function AboutPage() {
               </div>
             </div>
             <p className="text-xs sm:text-sm text-muted">
-              Chakradhar is a software engineer passionate about developer tooling, systems design, and helping students crack technical placements. You can connect on{' '}
+              Chakradhar is a software engineer passionate about developer tooling, systems design, and helping students crack technical placements. Follow updates on our official{' '}
               <a
-                href="https://www.linkedin.com/in/chakradhar-danesh/"
+                href="https://www.linkedin.com/company/syntaxflowarticles"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent hover:underline font-semibold"
               >
-                LinkedIn
+                LinkedIn Page
               </a>{' '}
               or reach out directly via email.
             </p>

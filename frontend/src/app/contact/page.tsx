@@ -49,14 +49,14 @@ export default function ContactPage() {
                   </a>
                 </div>
                 <div>
-                  <span className="text-muted block text-[11px] font-mono uppercase">Curator LinkedIn</span>
+                  <span className="text-muted block text-[11px] font-mono uppercase">Official LinkedIn</span>
                   <a
-                    href="https://www.linkedin.com/in/chakradhar-danesh/"
+                    href="https://www.linkedin.com/company/syntaxflowarticles"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-accent hover:underline font-semibold"
                   >
-                    linkedin.com/in/chakradhar-danesh
+                    linkedin.com/company/syntaxflowarticles
                   </a>
                 </div>
                 <div>
