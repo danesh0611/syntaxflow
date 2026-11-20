@@ -128,6 +128,48 @@ export const CORE_SUBJECTS: SubjectConfig[] = [
         )
       );
     },
+    units: [
+      {
+        id: 'unit-1',
+        number: 1,
+        name: 'Unit 1',
+        title: 'Finite Automata, Regular Languages & Regular Expressions',
+        description:
+          'DFA, NFA, ε-NFA conversion, DFA minimization, regular expressions, Arden’s theorem, equivalence, and Pumping Lemma for regular languages.',
+      },
+      {
+        id: 'unit-2',
+        number: 2,
+        name: 'Unit 2',
+        title: 'Formal Grammars, Chomsky Hierarchy & Context-Free Languages',
+        description:
+          'Grammar 4-tuple G = (V, T, P, S), Chomsky classification (Type 0–3), derivations, parse trees, ambiguity in CFGs, simplification, and normal forms (CNF, GNF).',
+      },
+      {
+        id: 'unit-3',
+        number: 3,
+        name: 'Unit 3',
+        title: 'Pushdown Automata (PDA) & Context-Free Grammars',
+        description:
+          'Non-deterministic PDA, acceptance by final state and empty stack, equivalence of PDA and CFG, and deterministic pushdown automata (DPDA).',
+      },
+      {
+        id: 'unit-4',
+        number: 4,
+        name: 'Unit 4',
+        title: 'Turing Machines (TM) & Computability Theory',
+        description:
+          'Standard Turing machine model, transition functions, instantaneous descriptions, multi-tape & non-deterministic TMs, Church-Turing thesis, and halting problem.',
+      },
+      {
+        id: 'unit-5',
+        number: 5,
+        name: 'Unit 5',
+        title: 'Decidability, Undecidability & Complexity Classes',
+        description:
+          'Decidable and undecidable problems, Post Correspondence Problem (PCP), Rice’s theorem, and time/space complexity classes (P, NP, NP-Complete).',
+      },
+    ],
   },
 ];
 
@@ -146,19 +188,15 @@ export function getAllSubjectSlugs(): string[] {
   return CORE_SUBJECTS.map((s) => s.slug);
 }
 
-export function getArticleUnitNumber(article: Article, subjectId: string): number {
-  if (subjectId === 'cn') {
-    const tags = article.tags || [];
-    // Check tags for explicit unit e.g. "Unit 1", "Unit 2", "unit-1"
-    for (const t of tags) {
-      const match = t.match(/unit\s*([1-5])/i);
-      if (match) {
-        const num = parseInt(match[1], 10);
-        if (num >= 1 && num <= 5) return num;
-      }
+export function getArticleUnitNumber(article: Article, subjectId?: string): number {
+  const tags = article.tags || [];
+  // Check tags for explicit unit e.g. "Unit 1", "Unit 2", "unit-1"
+  for (const t of tags) {
+    const match = t.match(/unit\s*([1-5])/i);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num >= 1 && num <= 5) return num;
     }
-    // Default all current Computer Networks articles to Unit 1
-    return 1;
   }
   return 1;
 }
