@@ -7,6 +7,35 @@ export const runtime = 'edge';
 // Newsletter Subscribe API — Brevo Contacts + Welcome Email (Direct to Subscriber)
 // ---------------------------------------------------------------------------
 
+function emailToDocId(email: string): string {
+  return btoa(email.toLowerCase().trim()).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/** Save subscriber to Firebase Firestore */
+async function saveSubscriberToFirebase(email: string) {
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const apiKey = process.env.FIREBASE_API_KEY;
+
+  if (!projectId || !apiKey) {
+    return;
+  }
+
+  const docId = emailToDocId(email);
+  const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/newsletter_subscribers/${docId}?key=${apiKey}`;
+
+  await fetch(firestoreUrl, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      fields: {
+        email: { stringValue: email },
+        subscribedAt: { timestampValue: new Date().toISOString() },
+        status: { stringValue: 'active' },
+      },
+    }),
+  });
+}
+
 function buildWelcomeHtml(to: string): string {
   return `
 <!DOCTYPE html>
@@ -161,7 +190,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Save subscriber in Brevo
+    // 2. Save subscriber in Brevo & Firebase
     if (brevoApiKey) {
       try {
         await fetch('https://api.brevo.com/v3/contacts', {
@@ -181,6 +210,13 @@ export async function POST(request: Request) {
       } catch (saveErr) {
         console.error('Brevo subscriber save error:', saveErr);
       }
+    }
+
+    // Save to Firebase Firestore
+    try {
+      await saveSubscriberToFirebase(email);
+    } catch (fbErr) {
+      console.error('Firebase subscriber save error:', fbErr);
     }
 
     // 3. Send welcome email directly to the subscriber
