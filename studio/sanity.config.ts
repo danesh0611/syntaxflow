@@ -11,6 +11,7 @@ export default defineConfig({
   title: 'SyntaxFlow CMS',
   projectId,
   dataset,
+  basePath: '/studio',
   studioHost: 'articles1234',
   plugins: [deskTool(), visionTool()],
   schema: {
