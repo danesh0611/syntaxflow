@@ -235,6 +235,33 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
           </div>
         </section>
 
+        {/* ── CALLOUT: CONTRIBUTE YOUR WORK ── */}
+        <div className="mb-12 p-5 sm:p-6 rounded-xl bg-card-bg border border-card-border flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div className="space-y-1 max-w-2xl">
+            <div className="flex items-center gap-2 text-xs font-mono text-muted">
+              <span className="font-semibold text-foreground">Write for Syntax Flow</span>
+              <span>&bull;</span>
+              <span>Contributor Program</span>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold text-foreground">
+              Share your technical write-ups and placement guides
+            </h2>
+            <p className="text-xs sm:text-sm text-muted leading-relaxed">
+              Publishing 1 article earns you a <strong>Contributor Medal</strong> and features you on the website for a month. Publishing 20 articles earns an official <strong>Technical Writing Certificate</strong>.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 flex-shrink-0 w-full sm:w-auto">
+            <Link
+              href="/contribute"
+              className="w-full sm:w-auto px-4 py-2 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 active:scale-98 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <span>Contribute an Article</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
+        </div>
+
         {/* ── 2. SECTION: CODING ROUNDS & DSA EDITORIALS ─────────────── */}
         <section ref={dsaSectionRef} className="mb-12 sm:mb-16" style={{ scrollMarginTop: '80px' }}>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-card-border pb-4 mb-6">

@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SubscribeModal } from '@/components/SubscribeModal';
+import { ContributeModal } from '@/components/ContributeModal';
 
 export const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark' | null>(null);
   const [subscribeOpen, setSubscribeOpen] = useState(false);
+  const [contributeOpen, setContributeOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [coreMenuOpen, setCoreMenuOpen] = useState(false);
   const [isCourseParticipant, setIsCourseParticipant] = useState(false);
@@ -150,6 +152,18 @@ export const Header: React.FC = () => {
                 </span>
               </Link>
             )}
+
+            {/* Contribute Link */}
+            <Link
+              href="/contribute"
+              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                pathname === '/contribute'
+                  ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
+                  : 'hover:text-foreground hover:bg-card-border/30'
+              }`}
+            >
+              Contribute
+            </Link>
 
             <div className="w-px h-4 bg-card-border mx-1" />
 
@@ -305,6 +319,16 @@ export const Header: React.FC = () => {
               </Link>
             )}
 
+            {/* Mobile Contribute Option */}
+            <Link
+              href="/contribute"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-card-border/30 transition-colors"
+            >
+              <span>Contribute</span>
+              <span className="text-xs text-muted">Submit article &rarr;</span>
+            </Link>
+
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
@@ -323,6 +347,9 @@ export const Header: React.FC = () => {
 
       {/* Subscribe Modal */}
       <SubscribeModal isOpen={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
+
+      {/* Contribute Modal */}
+      <ContributeModal isOpen={contributeOpen} onClose={() => setContributeOpen(false)} />
     </>
   );
 };

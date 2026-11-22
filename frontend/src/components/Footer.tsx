@@ -123,6 +123,11 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/contribute" className="hover:text-foreground transition-colors">
+                  Contribute Your Work
+                </Link>
+              </li>
+              <li>
                 <Link href="/search" className="hover:text-foreground transition-colors">
                   Search Archive
                 </Link>
@@ -177,6 +182,8 @@ export const Footer: React.FC = () => {
         <div className="border-t border-card-border/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
           <p>© {currentYear} SyntaxFlow. Published for software engineers.</p>
           <div className="flex items-center gap-4 text-[11px]">
+            <Link href="/contribute" className="text-accent hover:underline font-semibold">Contribute</Link>
+            <span>·</span>
             <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
             <span>·</span>
             <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
