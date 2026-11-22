@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 function generateSubmissionId(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -158,50 +157,7 @@ async function createSanityDraft(submission: Record<string, any>) {
   }
 }
 
-function getDataFilePath(): string {
-  const candidates = [
-    path.join(process.cwd(), 'src', 'data', 'contributions.json'),
-    path.join(process.cwd(), 'frontend', 'src', 'data', 'contributions.json'),
-  ];
-  for (const c of candidates) {
-    if (fs.existsSync(c)) return c;
-  }
-  return candidates[0];
-}
 
-/** Helper to safely append submission to local json file */
-function saveToLocalBackup(submission: Record<string, any>) {
-  try {
-    const dataFilePath = getDataFilePath();
-    let existingList: any[] = [];
-    if (fs.existsSync(dataFilePath)) {
-      try {
-        const raw = fs.readFileSync(dataFilePath, 'utf8');
-        existingList = JSON.parse(raw);
-        if (!Array.isArray(existingList)) existingList = [];
-      } catch {
-        existingList = [];
-      }
-    }
-
-    // Sanitize documentData and photo for json file size if very large
-    const safeSubmission = {
-      ...submission,
-      photo: typeof submission.photo === 'string' && submission.photo.length > 50000 ? '' : submission.photo,
-      documentData:
-        submission.documentData && typeof submission.documentData === 'string' && submission.documentData.length > 50000
-          ? `${submission.documentData.slice(0, 50000)}...[truncated]`
-          : submission.documentData,
-    };
-
-    existingList.unshift(safeSubmission);
-    fs.writeFileSync(dataFilePath, JSON.stringify(existingList, null, 2), 'utf8');
-    return true;
-  } catch (err) {
-    console.error('Error saving to local backup:', err);
-    return false;
-  }
-}
 
 /** Optional confirmation email via Brevo */
 async function sendConfirmationEmail(
@@ -316,8 +272,8 @@ async function sendConfirmationEmail(
         <div style="margin-top:20px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#64748b;">
           <strong>Where to review:</strong>
           <ul style="margin:6px 0 0;padding-left:18px;">
+            <li>Sanity Studio: <strong>Contributor Submissions</strong> desk</li>
             <li>Firestore collection: <code>contributor_submissions/${submissionId}</code></li>
-            <li>Local file: <code>frontend/src/data/contributions.json</code></li>
           </ul>
         </div>
       </div>
@@ -345,26 +301,32 @@ async function sendConfirmationEmail(
 /** GET: Retrieve featured community contributors */
 export async function GET() {
   try {
-    const dataFilePath = getDataFilePath();
-    if (fs.existsSync(dataFilePath)) {
-      const raw = fs.readFileSync(dataFilePath, 'utf8');
-      const list = JSON.parse(raw);
-      if (Array.isArray(list)) {
-        // Return public contributor cards (strip sensitive raw docs and limit photo size)
-        const publicContributors = list.slice(0, 12).map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          bio: item.bio || 'SyntaxFlow Tech Writer',
-          socialLink: item.socialLink || '',
-          photo: item.photo && item.photo.length < 50000 ? item.photo : '',
-          title: item.title,
-          category: item.category || 'Engineering',
-          articlesCount: item.articlesCount || 1,
-          isCertified: Boolean(item.isCertified || item.articlesCount >= 20),
-          status: item.status || 'approved',
-          submittedAt: item.submittedAt,
-        }));
-        return NextResponse.json({ contributors: publicContributors });
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const apiKey = process.env.FIREBASE_API_KEY;
+
+    if (projectId && apiKey) {
+      const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/contributor_submissions?key=${apiKey}&pageSize=12`;
+      const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
+      if (res.ok) {
+        const data = await res.json();
+        const documents = data.documents || [];
+        const contributors = documents.map((doc: any) => {
+          const f = doc.fields || {};
+          return {
+            id: f.submissionId?.stringValue || '',
+            name: f.name?.stringValue || 'Contributor',
+            bio: f.bio?.stringValue || 'SyntaxFlow Tech Writer',
+            socialLink: f.socialLink?.stringValue || '',
+            photo: f.photo?.stringValue || '',
+            title: f.title?.stringValue || 'Community Contribution',
+            category: f.category?.stringValue || 'Engineering',
+            articlesCount: 1,
+            isCertified: false,
+            status: f.status?.stringValue || 'approved',
+            submittedAt: f.submittedAt?.timestampValue || new Date().toISOString(),
+          };
+        });
+        return NextResponse.json({ contributors });
       }
     }
     return NextResponse.json({ contributors: [] });
@@ -494,10 +456,7 @@ export async function POST(request: Request) {
     // 2. Create as an unpublished Draft in Sanity Studio
     await createSanityDraft(submissionRecord);
 
-    // 3. Save to local JSON backup
-    saveToLocalBackup(submissionRecord);
-
-    // 4. Dispatch confirmation & editorial alert email (async, non-blocking)
+    // 3. Dispatch confirmation & editorial alert email (async, non-blocking)
     sendConfirmationEmail(name, email, title, submissionId, {
       category,
       summary,
