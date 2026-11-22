@@ -50,11 +50,17 @@ export default defineType({
       rows: 3,
     }),
     defineField({
+      name: 'documentFile',
+      title: 'Uploaded Document File',
+      type: 'file',
+      description: 'The actual uploaded file (.pdf, .docx, .md, .txt) submitted by the contributor. Click to download or view directly.',
+    }),
+    defineField({
       name: 'documentContent',
-      title: 'Article Draft Content (Copy & Paste from here)',
+      title: 'Article Text / Draft Notes',
       type: 'text',
-      rows: 30,
-      description: 'The full markdown / draft content submitted by the contributor. You can copy-paste this into a Post to publish.',
+      rows: 15,
+      description: 'Any direct text, markdown, or notes typed into the submission form.',
     }),
     defineField({
       name: 'fileName',

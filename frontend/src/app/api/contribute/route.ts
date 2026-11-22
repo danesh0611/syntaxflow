@@ -3,6 +3,19 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
 
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(buffer).toString('base64');
+  }
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 function generateSubmissionId(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
   const rand = Math.floor(1000 + Math.random() * 9000);
@@ -82,8 +95,41 @@ const SANITY_CATEGORY_MAP: Record<string, string> = {
   'other': '4ea66247-fffb-46da-bca3-c771a4baaa9f',
 };
 
+/** Helper to upload raw file binary directly to Sanity Assets (native file card in Studio) */
+async function uploadSanityFile(
+  fileBuffer: ArrayBuffer,
+  fileName: string,
+  fileType: string,
+  projectId: string,
+  dataset: string,
+  token: string
+): Promise<string | null> {
+  try {
+    const encodedFileName = encodeURIComponent(fileName || 'document_upload');
+    const assetUrl = `https://${projectId}.api.sanity.io/v2024-05-25/assets/files/${dataset}?filename=${encodedFileName}`;
+    const res = await fetch(assetUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': fileType || 'application/octet-stream',
+        Authorization: `Bearer ${token}`,
+      },
+      body: fileBuffer,
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.document?._id || null;
+    }
+    const errText = await res.text();
+    console.error('[Sanity] File asset upload failed:', errText);
+    return null;
+  } catch (err) {
+    console.error('[Sanity] File asset upload error:', err);
+    return null;
+  }
+}
+
 /** Helper to create a document in the dedicated Contributor Submissions schema in Sanity Studio */
-async function createSanityDraft(submission: Record<string, any>) {
+async function createSanityDraft(submission: Record<string, any>, fileBuffer?: ArrayBuffer | null) {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'uxe5yl0p';
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
   const token =
@@ -95,40 +141,72 @@ async function createSanityDraft(submission: Record<string, any>) {
     return { created: false, reason: 'missing_project_id' };
   }
 
+  if (!token) {
+    console.log(
+      '[Sanity] Note: SANITY_API_TOKEN is not configured in environment variables. Contribution prepared for Sanity Studio.'
+    );
+    return { created: false, reason: 'missing_token' };
+  }
+
+  // If a file was uploaded, upload it natively to Sanity Assets first
+  let fileAssetId: string | null = null;
+  if (fileBuffer && fileBuffer.byteLength > 0) {
+    fileAssetId = await uploadSanityFile(
+      fileBuffer,
+      submission.fileName,
+      submission.fileType,
+      projectId,
+      dataset,
+      token
+    );
+  }
+
   // Saved under dedicated contribution document ID in Sanity Studio
   const docId = `contrib-${(submission.id || Date.now().toString()).toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
   const rawContent = submission.documentData || submission.directText || submission.summary || '';
+  const safeContent =
+    typeof rawContent === 'string' && rawContent.length > 500000
+      ? `${rawContent.slice(0, 500000)}\n\n[Content truncated for Sanity limit]`
+      : rawContent;
+  const safePhoto =
+    typeof submission.photo === 'string' && submission.photo.length < 100000 ? submission.photo : '';
+
+  const docFields: Record<string, any> = {
+    _id: docId,
+    _type: 'contribution',
+    title: submission.title || 'Untitled Submission',
+    authorName: submission.name || 'Anonymous',
+    authorEmail: submission.email || '',
+    authorPhoto: safePhoto,
+    bio: submission.bio || '',
+    socialLink: submission.socialLink || '',
+    category: submission.category || 'General',
+    summary: submission.summary || '',
+    documentContent: safeContent,
+    fileName: submission.fileName || '',
+    status: 'pending',
+    submissionId: submission.id || '',
+    submittedAt: new Date(submission.submittedAt || Date.now()).toISOString(),
+  };
+
+  // Attach native file asset if uploaded
+  if (fileAssetId) {
+    docFields.documentFile = {
+      _type: 'file',
+      asset: {
+        _type: 'reference',
+        _ref: fileAssetId,
+      },
+    };
+  }
 
   const mutationPayload = {
     mutations: [
       {
-        createOrReplace: {
-          _id: docId,
-          _type: 'contribution',
-          title: submission.title || 'Untitled Submission',
-          authorName: submission.name || 'Anonymous',
-          authorEmail: submission.email || '',
-          authorPhoto: typeof submission.photo === 'string' && submission.photo.length < 500000 ? submission.photo : '',
-          bio: submission.bio || '',
-          socialLink: submission.socialLink || '',
-          category: submission.category || 'General',
-          summary: submission.summary || '',
-          documentContent: rawContent,
-          fileName: submission.fileName || 'draft.md',
-          status: 'pending',
-          submissionId: submission.id || '',
-          submittedAt: new Date(submission.submittedAt || Date.now()).toISOString(),
-        },
+        createOrReplace: docFields,
       },
     ],
   };
-
-  if (!token) {
-    console.log(
-      '[Sanity] Note: SANITY_API_TOKEN is not configured in .env.local yet. Contribution mutation payload prepared for Sanity Studio.'
-    );
-    return { created: false, reason: 'missing_token', docId, mutationPayload };
-  }
 
   try {
     const res = await fetch(
@@ -352,6 +430,7 @@ export async function POST(request: Request) {
     let fileSize = 0;
     let documentData = '';
     let directText = '';
+    let fileBuffer: ArrayBuffer | null = null;
 
     const contentType = request.headers.get('content-type') || '';
 
@@ -371,7 +450,7 @@ export async function POST(request: Request) {
       const photoFile = formData.get('photoFile') as File | null;
       if (photoFile && photoFile.size > 0) {
         const photoBuffer = await photoFile.arrayBuffer();
-        const photoBase64 = Buffer.from(photoBuffer).toString('base64');
+        const photoBase64 = arrayBufferToBase64(photoBuffer);
         photo = `data:${photoFile.type || 'image/jpeg'};base64,${photoBase64}`;
       }
 
@@ -381,12 +460,13 @@ export async function POST(request: Request) {
         fileName = documentFile.name;
         fileType = documentFile.type;
         fileSize = documentFile.size;
+        fileBuffer = await documentFile.arrayBuffer();
 
-        if (documentFile.type.includes('text') || fileName.endsWith('.md') || fileName.endsWith('.txt')) {
-          documentData = await documentFile.text();
-        } else {
-          const docBuffer = await documentFile.arrayBuffer();
-          documentData = `data:${documentFile.type || 'application/octet-stream'};base64,${Buffer.from(docBuffer).toString('base64')}`;
+        // If it's markdown or text, read it for text preview as well
+        if (fileName.endsWith('.md') || fileName.endsWith('.txt') || fileType.includes('text')) {
+          try {
+            documentData = await documentFile.text();
+          } catch {}
         }
       }
     } else {
@@ -453,8 +533,8 @@ export async function POST(request: Request) {
     // 1. Save to Firebase Firestore
     await saveToFirestore(submissionRecord);
 
-    // 2. Create as an unpublished Draft in Sanity Studio
-    await createSanityDraft(submissionRecord);
+    // 2. Create as an unpublished Draft in Sanity Studio (with native file attachment)
+    const sanityRes = await createSanityDraft(submissionRecord, fileBuffer);
 
     // 3. Dispatch confirmation & editorial alert email (async, non-blocking)
     sendConfirmationEmail(name, email, title, submissionId, {
@@ -467,6 +547,7 @@ export async function POST(request: Request) {
       {
         success: true,
         submissionId,
+        sanityDraftCreated: sanityRes.created,
         message: 'Your contribution has been received and stored. Once approved, you will earn the Contributor Medal and be featured on the website for a month.',
         milestone: {
           articlesSubmitted: 1,
