@@ -60,6 +60,18 @@ export default function ContactPage() {
                   </a>
                 </div>
                 <div>
+                  <span className="text-muted block text-[11px] font-mono uppercase">WhatsApp Community (Tech &amp; Job Updates)</span>
+                  <a
+                    href="https://whatsapp.com/channel/0029Vb9nkyB4Y9lqHPPzes3G"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold inline-flex items-center gap-1 mt-0.5"
+                  >
+                    <span>Join WhatsApp Channel</span>
+                    <span aria-hidden="true">&rarr;</span>
+                  </a>
+                </div>
+                <div>
                   <span className="text-muted block text-[11px] font-mono uppercase">Typical Response Time</span>
                   <span className="text-foreground">Within 24 to 48 hours</span>
                 </div>

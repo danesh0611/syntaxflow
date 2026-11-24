@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SubscribeModal } from '@/components/SubscribeModal';
 import { ContributeModal } from '@/components/ContributeModal';
+import { WhatsAppTopBanner } from '@/components/WhatsAppTopBanner';
+import { WHATSAPP_CHANNEL_URL, WhatsAppIcon } from '@/components/WhatsAppCommunityCard';
 
 export const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -74,99 +76,116 @@ export const Header: React.FC = () => {
             : 'border-b border-card-border/40 bg-background/70 backdrop-blur-sm'
         }`}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-15 flex items-center justify-between">
-          {/* Brand Logo - Engineering & Placement Hub */}
-          <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center font-mono font-bold text-sm tracking-tighter shadow-xs group-hover:opacity-90 transition-opacity">
-              SF
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-lg font-black text-foreground tracking-tight">
-                SyntaxFlow
-              </span>
-              <span className="hidden sm:inline-block text-[10px] font-mono uppercase tracking-widest text-muted border-l border-card-border pl-1.5 py-0.5">
-                Tech &amp; Placements
-              </span>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-muted">
-            <Link
-              href="/"
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
-                pathname === '/'
-                  ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
-                  : 'hover:text-foreground hover:bg-card-border/30'
-              }`}
-            >
-              Articles
-            </Link>
-            <Link
-              href="/#categories"
-              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-card-border/30 transition-colors"
-            >
-              Topics
+        <WhatsAppTopBanner />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-15 flex items-center justify-between gap-4">
+          {/* Left Group: Brand Logo & Navigation Links (moved left) */}
+          <div className="flex items-center gap-4 xl:gap-6 min-w-0">
+            {/* Brand Logo - Engineering & Placement Hub */}
+            <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center font-mono font-bold text-sm tracking-tighter shadow-xs group-hover:opacity-90 transition-opacity">
+                SF
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-lg font-black text-foreground tracking-tight">
+                  SyntaxFlow
+                </span>
+                <span className="hidden xl:inline-block text-[10px] font-mono uppercase tracking-widest text-muted border-l border-card-border pl-1.5 py-0.5">
+                  Tech &amp; Placements
+                </span>
+              </div>
             </Link>
 
-            {/* Core Subjects Link */}
-            <Link
-              href="/core-subjects"
-              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
-                pathname === '/core-subjects' || pathname.startsWith('/core-subjects/')
-                  ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
-                  : 'hover:text-foreground hover:bg-card-border/30'
-              }`}
-            >
-              Core Subjects
-            </Link>
-            <Link
-              href="/dsa-sheet"
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
-                pathname === '/dsa-sheet'
-                  ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
-                  : 'hover:text-foreground hover:bg-card-border/30'
-              }`}
-            >
-              <span>DSA Sheet</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded border border-card-border bg-card-bg text-muted-foreground">
-                100
-              </span>
-            </Link>
-            {isCourseParticipant ? (
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 text-xs xl:text-sm font-medium text-muted">
               <Link
-                href="/sql-course/dashboard"
-                className="px-3 py-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 font-semibold hover:bg-emerald-500/10 transition-colors flex items-center gap-1.5"
+                href="/"
+                className={`px-2.5 py-1.5 rounded-lg transition-colors ${
+                  pathname === '/'
+                    ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
+                    : 'hover:text-foreground hover:bg-card-border/30'
+                }`}
               >
-                <span>SQL Dashboard</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Articles
               </Link>
-            ) : (
               <Link
-                href="/sql-course"
-                className="px-3 py-1.5 rounded-lg text-accent font-semibold hover:bg-accent/10 transition-colors flex items-center gap-1.5"
+                href="/#categories"
+                className="px-2.5 py-1.5 rounded-lg hover:text-foreground hover:bg-card-border/30 transition-colors"
               >
-                <span>SQL Course</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded border border-accent/20 bg-accent/5 text-accent">
-                  Free
+                Topics
+              </Link>
+
+              {/* Core Subjects Link */}
+              <Link
+                href="/core-subjects"
+                className={`px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                  pathname === '/core-subjects' || pathname.startsWith('/core-subjects/')
+                    ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
+                    : 'hover:text-foreground hover:bg-card-border/30'
+                }`}
+              >
+                Core Subjects
+              </Link>
+              <Link
+                href="/dsa-sheet"
+                className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
+                  pathname === '/dsa-sheet'
+                    ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
+                    : 'hover:text-foreground hover:bg-card-border/30'
+                }`}
+              >
+                <span>DSA Sheet</span>
+                <span className="hidden xl:inline-block text-[10px] font-mono px-1.5 py-0.2 rounded border border-card-border bg-card-bg text-muted-foreground">
+                  100
                 </span>
               </Link>
-            )}
+              {isCourseParticipant ? (
+                <Link
+                  href="/sql-course/dashboard"
+                  className="px-2.5 py-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 font-semibold hover:bg-emerald-500/10 transition-colors flex items-center gap-1.5"
+                >
+                  <span>SQL Dashboard</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                </Link>
+              ) : (
+                <Link
+                  href="/sql-course"
+                  className="px-2.5 py-1.5 rounded-lg text-accent font-semibold hover:bg-accent/10 transition-colors flex items-center gap-1.5"
+                >
+                  <span>SQL Course</span>
+                  <span className="hidden xl:inline-block text-[10px] font-mono px-1.5 py-0.2 rounded border border-accent/20 bg-accent/5 text-accent">
+                    Free
+                  </span>
+                </Link>
+              )}
 
-            {/* Contribute Link */}
-            <Link
-              href="/contribute"
-              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
-                pathname === '/contribute'
-                  ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
-                  : 'hover:text-foreground hover:bg-card-border/30'
-              }`}
-            >
-              Contribute
-            </Link>
+              {/* Contribute Link */}
+              <Link
+                href="/contribute"
+                className={`px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                  pathname === '/contribute'
+                    ? 'text-foreground bg-card-bg border border-card-border shadow-xs font-semibold'
+                    : 'hover:text-foreground hover:bg-card-border/30'
+                }`}
+              >
+                Contribute
+              </Link>
 
-            <div className="w-px h-4 bg-card-border mx-1" />
+              {/* WhatsApp Community Link */}
+              <a
+                href={WHATSAPP_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2.5 py-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 font-medium transition-colors flex items-center gap-1.5"
+                title="Join WhatsApp Community for Tech & Job Updates"
+              >
+                <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
+                <span>Community</span>
+              </a>
+            </nav>
+          </div>
 
+          {/* Right Action Tools - Protected from cutting off */}
+          <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -188,13 +207,13 @@ export const Header: React.FC = () => {
             {/* Search Pill */}
             <Link
               href="/search"
-              className="flex items-center gap-2 text-xs font-medium text-muted hover:text-foreground bg-card-bg border border-card-border hover:border-card-border-hover px-2.5 py-1.5 rounded-lg transition-colors ml-1"
+              className="flex items-center gap-2 text-xs font-medium text-muted hover:text-foreground bg-card-bg border border-card-border hover:border-card-border-hover px-2.5 py-1.5 rounded-lg transition-colors"
             >
               <svg className="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <span>Search</span>
-              <kbd className="hidden lg:inline-block font-mono text-[10px] text-muted border border-card-border rounded px-1">
+              <span className="hidden xl:inline">Search</span>
+              <kbd className="hidden xl:inline-block font-mono text-[10px] text-muted border border-card-border rounded px-1">
                 /
               </kbd>
             </Link>
@@ -203,14 +222,14 @@ export const Header: React.FC = () => {
             <button
               id="header-subscribe-btn"
               onClick={() => setSubscribeOpen(true)}
-              className="ml-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 active:scale-98 transition-all cursor-pointer"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-foreground text-background hover:opacity-90 active:scale-98 transition-all cursor-pointer whitespace-nowrap"
             >
               Subscribe
             </button>
-          </nav>
+          </div>
 
           {/* Mobile Actions Bar */}
-          <div className="flex md:hidden items-center gap-1">
+          <div className="flex lg:hidden items-center gap-1">
             <Link
               href="/search"
               className="p-2 rounded-lg text-muted hover:text-foreground transition-colors"
@@ -257,7 +276,7 @@ export const Header: React.FC = () => {
 
         {/* Mobile Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-card-border bg-background/95 backdrop-blur-xl px-4 py-4 space-y-2 animate-fade-in shadow-lg">
+          <div className="lg:hidden border-t border-card-border bg-background/95 backdrop-blur-xl px-4 py-4 space-y-2 animate-fade-in shadow-lg">
             <Link
               href="/"
               className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-card-border/30 transition-colors"
@@ -328,6 +347,23 @@ export const Header: React.FC = () => {
               <span>Contribute</span>
               <span className="text-xs text-muted">Submit article &rarr;</span>
             </Link>
+
+            {/* Mobile WhatsApp Community Option */}
+            <a
+              href={WHATSAPP_CHANNEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <WhatsAppIcon className="w-4 h-4 fill-emerald-600 dark:fill-emerald-400" />
+                <span>Join WhatsApp Community</span>
+              </div>
+              <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
+                Updates
+              </span>
+            </a>
 
             <button
               onClick={() => {

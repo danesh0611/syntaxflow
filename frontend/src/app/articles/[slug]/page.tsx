@@ -8,6 +8,7 @@ import { getBaseUrl } from '@/lib/utils';
 import { SqlCourseArticleGate } from '@/components/sql-course/SqlCourseArticleGate';
 import { MarkAsReadButton } from '@/components/MarkAsReadButton';
 import { HtmlArticleRenderer } from '@/components/HtmlArticleRenderer';
+import { WhatsAppCommunityCard } from '@/components/WhatsAppCommunityCard';
 import { getOptimizedImageUrl, getSanitySrcSet } from '@/lib/image';
 
 const RichContent = dynamicImport(
@@ -310,6 +311,11 @@ export default async function ArticlePage({ params }: PageProps) {
               />
             )}
           </SqlCourseArticleGate>
+
+          {/* WhatsApp Community Callout */}
+          <div className="mt-10 mb-4">
+            <WhatsAppCommunityCard variant="compact" />
+          </div>
 
           {/* Author Card */}
           <div className="border-t border-card-border pt-8 mt-12">

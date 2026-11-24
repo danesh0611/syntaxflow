@@ -94,7 +94,16 @@ export default function AboutPage() {
               </div>
             </div>
             <p className="text-xs sm:text-sm text-muted">
-              Chakradhar is a software engineer passionate about developer tooling, systems design, and helping students crack technical placements. Follow updates on our official{' '}
+              Chakradhar is a software engineer passionate about developer tooling, systems design, and helping students crack technical placements. Join our official{' '}
+              <a
+                href="https://whatsapp.com/channel/0029Vb9nkyB4Y9lqHPPzes3G"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold"
+              >
+                WhatsApp Community
+              </a>{' '}
+              for latest tech updates, job alerts, and website tutorials, follow our{' '}
               <a
                 href="https://www.linkedin.com/company/syntaxflowarticles"
                 target="_blank"
@@ -102,8 +111,8 @@ export default function AboutPage() {
                 className="text-accent hover:underline font-semibold"
               >
                 LinkedIn Page
-              </a>{' '}
-              or reach out directly via email.
+              </a>
+              , or reach out directly via email.
             </p>
           </section>
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { WHATSAPP_CHANNEL_URL, WhatsAppIcon } from './WhatsAppCommunityCard';
 
 interface SubscribeModalProps {
   isOpen: boolean;
@@ -169,6 +170,18 @@ export const SubscribeModal: React.FC<SubscribeModalProps> = ({ isOpen, onClose 
             <p className="mt-3 text-center text-[10px] text-muted">
               One-click unsubscribe at any time.
             </p>
+
+            <div className="mt-4 pt-3 border-t border-card-border/60 text-center">
+              <a
+                href={WHATSAPP_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
+                <span>Prefer WhatsApp? Join our Community &rarr;</span>
+              </a>
+            </div>
           </div>
         )}
       </div>

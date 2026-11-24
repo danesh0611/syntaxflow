@@ -5,6 +5,7 @@ import { Article, Category } from '@/lib/types';
 import { ArticleCard } from '@/components/ArticleCard';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { WhatsAppCommunityCard } from '@/components/WhatsAppCommunityCard';
 import Link from 'next/link';
 
 interface HomeClientProps {
@@ -234,6 +235,11 @@ export default function HomeClient({ initialArticles, initialCategories }: HomeC
             </Link>
           </div>
         </section>
+
+        {/* ── CALLOUT: WHATSAPP COMMUNITY ── */}
+        <div className="mb-12">
+          <WhatsAppCommunityCard variant="banner" />
+        </div>
 
         {/* ── CALLOUT: CONTRIBUTE YOUR WORK ── */}
         <div className="mb-12 p-5 sm:p-6 rounded-xl bg-card-bg border border-card-border flex flex-col md:flex-row items-start md:items-center justify-between gap-5">

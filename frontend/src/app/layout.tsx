@@ -83,7 +83,10 @@ const organizationJsonLd = {
   name: 'SyntaxFlow',
   url: 'https://syntaxflowarticles.pages.dev',
   logo: 'https://syntaxflowarticles.pages.dev/favicon.ico',
-  sameAs: [],
+  sameAs: [
+    'https://www.linkedin.com/company/syntaxflowarticles',
+    'https://whatsapp.com/channel/0029Vb9nkyB4Y9lqHPPzes3G',
+  ],
 };
 
 export default function RootLayout({

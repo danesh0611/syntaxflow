@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
+import { WHATSAPP_CHANNEL_URL, WhatsAppIcon } from '@/components/WhatsAppCommunityCard';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -99,6 +100,26 @@ export const Footer: React.FC = () => {
                 <p className="text-[11px] text-muted">Curated technical reading. No spam, ever.</p>
               </form>
             )}
+
+            {/* WhatsApp Community Box */}
+            <div className="mt-6 pt-5 border-t border-card-border/60 max-w-sm">
+              <div className="flex items-center gap-2 mb-1.5">
+                <WhatsAppIcon className="w-4 h-4 fill-emerald-500" />
+                <span className="text-xs font-bold text-foreground">Join our WhatsApp Community</span>
+              </div>
+              <p className="text-[11px] text-muted leading-relaxed mb-2.5">
+                Get instant alerts for latest tech updates, job updates, new tech news &amp; website releases.
+              </p>
+              <a
+                href={WHATSAPP_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 transition-colors"
+              >
+                <span>Join WhatsApp Channel</span>
+                <span>&rarr;</span>
+              </a>
+            </div>
           </div>
 
           {/* Navigation Links */}
@@ -163,6 +184,17 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <a
+                  href={WHATSAPP_CHANNEL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 hover:text-foreground transition-colors text-emerald-600 dark:text-emerald-400 pt-1"
+                >
+                  <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
+                  <span>WhatsApp Community</span>
+                </a>
+              </li>
+              <li>
+                <a
                   href="https://www.linkedin.com/company/syntaxflowarticles"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -182,6 +214,15 @@ export const Footer: React.FC = () => {
         <div className="border-t border-card-border/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
           <p>© {currentYear} SyntaxFlow. Published for software engineers.</p>
           <div className="flex items-center gap-4 text-[11px]">
+            <a
+              href={WHATSAPP_CHANNEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold"
+            >
+              WhatsApp Community
+            </a>
+            <span>·</span>
             <Link href="/contribute" className="text-accent hover:underline font-semibold">Contribute</Link>
             <span>·</span>
             <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
