@@ -100,8 +100,56 @@ export const CORE_SUBJECTS: SubjectConfig[] = [
       'In-depth study guides covering Amplitude Shift Keying (ASK), Frequency Synthesizers, Direct Conversion, Superheterodyne, and Amplifier-Sequenced Hybrid (ASH) receiver architectures.',
     match: (a: Article) => {
       const cat = a.category?.trim().toLowerCase() || '';
-      return cat === 'short range wireless communication' || cat.includes('wireless');
+      if (cat === 'short range wireless communication' || cat.includes('wireless') || cat === 'srwc') return true;
+      return Boolean(
+        a.tags?.some((t) => {
+          const tl = t.toLowerCase();
+          return tl === 'srwc' || tl.includes('short range wireless') || tl.includes('wireless');
+        })
+      );
     },
+    units: [
+      {
+        id: 'unit-1',
+        number: 1,
+        name: 'Unit 1',
+        title: 'Wireless Systems, WLAN, Bluetooth, Zigbee & UWB',
+        description:
+          'Introduction to wireless systems, short-range radio characteristics, transmitter/receiver elements, WLAN & Wi-Fi architecture, Bluetooth modes, Zigbee frame structures, and Ultra-Wideband (UWB) technology.',
+      },
+      {
+        id: 'unit-2',
+        number: 2,
+        name: 'Unit 2',
+        title: 'Antennas, Propagation, Baseband Coding & Spread Spectrum',
+        description:
+          'Dipole, loop, helical & patch antennas, gain, directivity, impedance matching, radio link diagrams, code hopping, digital modulation, DSSS/FHSS spread spectrum, and RFID transceivers.',
+      },
+      {
+        id: 'unit-3',
+        number: 3,
+        name: 'Unit 3',
+        title: 'RF Transceivers, Receivers & Amplifiers',
+        description:
+          'RF sources, frequency control, SAW filters, TRF, ASH receivers, super-regenerative, superheterodyne, direct conversion receivers, and software-defined radio (SDR).',
+      },
+      {
+        id: 'unit-4',
+        number: 4,
+        name: 'Unit 4',
+        title: 'Wireless Standards, WPAN Regulations & 60 GHz Millimeter Wave',
+        description:
+          'FCC regulations, emission nomenclature, WPAN concepts, European Consortium IST-MAGNET project, IEEE 802.15.3c, 60 GHz propagation characterization, and multipath modeling.',
+      },
+      {
+        id: 'unit-5',
+        number: 5,
+        name: 'Unit 5',
+        title: 'Optical Wireless Technologies, UROOF & Visible Light Communication',
+        description:
+          'Ultra-wideband Radio-over-Optical-Fiber (UROOF), RF-to-optical conversion, integrated UROOF transceivers (IUT), clipping distortion, MB-OFDM over fiber, and Visible Light Communication (VLC) links.',
+      },
+    ],
   },
   {
     id: 'fla',
